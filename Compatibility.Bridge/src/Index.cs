@@ -46,7 +46,7 @@ namespace Compatibility.Bridge
         }
 
         public bool Equals(Index other)
-            => IsFromEnd == other.IsFromEnd && Value == other.Value;
+            => _value == other._value;
 
         public override bool Equals(object value)
             => value is Index other && Equals(other);

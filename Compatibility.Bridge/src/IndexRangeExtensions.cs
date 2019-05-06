@@ -88,7 +88,6 @@ namespace Compatibility.Bridge
 
             return
                 start >= 0
-                && start < length
                 && end > start
                 && end <= length;
         }
