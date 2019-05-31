@@ -20,35 +20,10 @@
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
 
-using System;
-using NUnit.Framework;
-using Compatibility.Bridge;
-
-namespace Tests
+namespace Compatibility.Bridge
 {
-    [TestFixture]
-    public class MemoryTests
+    public sealed class NoneType
     {
-        private string _input;
-        private char[] _inputArr;
-
-        [SetUp]
-        public void SetUp()
-        {
-            _input = " \t    1111    klfhakljfh01928091-__IU1IJHJK  1JHR KJ       \t 1111   ";
-            _inputArr = _input.ToCharArray();
-        }
-
-        [Test]
-        public void Test_Trim()
-        {
-            var s1 = _input.Trim();
-            var s2 = _inputArr.AsReadOnlySpan().Trim().ToString();
-            var s3 = _inputArr.AsReadOnlyMemory().Trim().ToString();
-
-            Assert.AreEqual(s1, s2);
-            Assert.AreEqual(s1, s3);
-        }
-       
+        public static NoneType None { get; } = new NoneType();
     }
 }

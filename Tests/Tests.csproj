@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\MaybeTests.cs" />
     <Compile Include="src\MemoryTests.cs" />
     <Compile Include="src\RangeTests.cs" />
     <Compile Include="src\IndexTests.cs" />
