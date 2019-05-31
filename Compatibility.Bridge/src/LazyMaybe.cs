@@ -62,10 +62,15 @@ namespace Compatibility.Bridge
 
         private LazyMaybe(Promise<T> promise)
             => _promise = promise;
-        
 
         public T Match(T @default = default)
             => _promise.Evaluate().Match(@default);
+
+        public T Match<TExcept>(TExcept except) where TExcept : Exception
+            => except is null
+                ? throw new ArgumentNullException(nameof(except))
+                : _promise.Evaluate().Match(except);
+
         public TTarget Match<TTarget>(Func<T, TTarget> selector, TTarget @default = default)
         {
             if (selector is null)
@@ -74,20 +79,18 @@ namespace Compatibility.Bridge
             return _promise.Evaluate().Match(selector, @default);
         }
 
+        public LazyMaybe<TTarget> SelectExpression<TTarget>(Expression<Func<T, TTarget>> selector)
+            => new LazyMaybe<TTarget>(_promise.CreateTransform(selector));
 
-        public LazyMaybe<TTarget> Select<TTarget>(Expression<Func<T, TTarget>> selector)
-            => new LazyMaybe<TTarget>(_promise.CreateNew(selector));
+        public LazyMaybe<TTarget> Select<TTarget>(Func<T, TTarget> selector)
+            => new LazyMaybe<TTarget>(_promise.CreateTransform(x => selector(x)));
+        
 
-        public LazyMaybe<TTarget> SelectLambda<TTarget>(Func<T, TTarget> selector)
-            => new LazyMaybe<TTarget>(_promise.CreateNew(x => selector(x)));
+        public LazyMaybe<T> WhereExpression(Expression<Func<T, bool>> predicate)
+            => new LazyMaybe<T>(_promise.CreateCondition(predicate));
 
-
-
-        public LazyMaybe<T> Where(Expression<Func<T, bool>> predicate)
-            => new LazyMaybe<T>(_promise.CreateConditional(predicate));
-
-        public LazyMaybe<T> WhereLambda(Func<T, bool> predicate)
-            => new LazyMaybe<T>(_promise.CreateConditional(x => predicate(x)));
+        public LazyMaybe<T> Where(Func<T, bool> predicate)
+            => new LazyMaybe<T>(_promise.CreateCondition(x => predicate(x)));
 
         public Awaiter GetAwaiter() => new Awaiter(_promise);
 
@@ -102,5 +105,10 @@ namespace Compatibility.Bridge
 
         public static implicit operator LazyMaybe<T>(NoneType _)
             => new LazyMaybe<T>();
+
+        internal static LazyMaybe<T> Flatten(LazyMaybe<LazyMaybe<T>> @this)
+        {
+            return new LazyMaybe<T>(new FlattenPromise<T>(@this._promise));
+        }
     }
 }

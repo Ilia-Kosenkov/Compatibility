@@ -22,6 +22,7 @@
 
 using System;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Threading.Tasks;
 using System.Xml.Schema;
 using Compatibility.Bridge;
@@ -79,9 +80,9 @@ namespace Tests
             var b = new LazyMaybe<int>(100);
             var c = new LazyMaybe<int>(150);
 
-            a = a.WhereLambda(Tester).Where(x => x > 60);
-            b = b.WhereLambda(Tester).Where(x => x > 60);
-            c = c.WhereLambda(Tester).Where(x => x > 60);
+            a = a.Where(Tester).WhereExpression(x => x > 60);
+            b = b.Where(Tester).WhereExpression(x => x > 60);
+            c = c.Where(Tester).WhereExpression(x => x > 60);
 
             var aa = a.Match(-1);
             var bb = b.Match(-1);
@@ -105,17 +106,29 @@ namespace Tests
         [Test]
         public async Task Test()
         {
-            var first = new LazyMaybe<int>(Task.Delay(6000).ContinueWith(x => new Maybe<int>(20)));
-            var second = new Maybe<int>(30);
+            var temp = new LazyMaybe<LazyMaybe<int>>(new LazyMaybe<int>(5));
+
+            var n = await from x in temp
+                    from y in x
+                    from z in Some(23)
+                    select y + z;
+
+            Assert.That(() => n.Match(new Exception()), Throws.Nothing);
+
+            var first = new LazyMaybe<int>(Task.Delay(2000).ContinueWith(x => new Maybe<int>(20)));
+            var second = new LazyMaybe<int>(Task.Delay(4000).ContinueWith(x => new Maybe<int>(30)));
 
             first = first.Select(x => x / 10).Select(x => x + 1);
             second = second.Select(x => x / 10).Select(x => x + 3);
 
-            var result = from x in await first
-                         from y in second
-                         select x * y;
+            var delayedResult = 
+                from x in first
+                from y in second
+                select x * y;
 
+            var result = await delayedResult;
 
+            Assert.That(delayedResult.Match(-1), Is.EqualTo(18));
         }
     }
 }

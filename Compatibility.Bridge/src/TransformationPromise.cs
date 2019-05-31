@@ -28,9 +28,12 @@ using Compatibility.Bridge.Internal;
 
 namespace Compatibility.Bridge
 {
-    internal interface IPromiseAwaiter<T> : INotifyCompletion
-    {
+    internal interface IPromiseAwaiter : INotifyCompletion
+    { 
         bool IsCompleted { get; }
+    }
+    internal interface IPromiseAwaiter<T> : IPromiseAwaiter
+    {
         Maybe<T> GetResult();
     }
 
@@ -38,9 +41,9 @@ namespace Compatibility.Bridge
     {
         public abstract Maybe<TTar> Evaluate();
 
-        public abstract Promise<TNew> CreateNew<TNew>(Expression<Func<TTar, TNew>> selector);
+        public abstract Promise<TNew> CreateTransform<TNew>(Expression<Func<TTar, TNew>> selector);
 
-        public abstract Promise<TTar> CreateConditional(Expression<Func<TTar, bool>> predicate);
+        public abstract Promise<TTar> CreateCondition(Expression<Func<TTar, bool>> predicate);
 
         public abstract IPromiseAwaiter<TTar> GetAwaiter();
     }
@@ -71,10 +74,10 @@ namespace Compatibility.Bridge
         public override Maybe<TTar> Evaluate()
             => _value;
 
-        public override Promise<TNew> CreateNew<TNew>(Expression<Func<TTar, TNew>> selector)
+        public override Promise<TNew> CreateTransform<TNew>(Expression<Func<TTar, TNew>> selector)
             => new TransformationPromise<TTar, TNew>(this, selector);
 
-        public override Promise<TTar> CreateConditional(Expression<Func<TTar, bool>> predicate)
+        public override Promise<TTar> CreateCondition(Expression<Func<TTar, bool>> predicate)
             => new ConditionPromise<TTar>(this, predicate);
 
         public override IPromiseAwaiter<TTar> GetAwaiter() => new Awaiter(_value);
@@ -145,7 +148,7 @@ namespace Compatibility.Bridge
             return _cached;
         }
 
-        public override Promise<TNew> CreateNew<TNew>(Expression<Func<TTar, TNew>> selector)
+        public override Promise<TNew> CreateTransform<TNew>(Expression<Func<TTar, TNew>> selector)
         {
             if (selector is null)
                 throw new ArgumentNullException(nameof(selector));
@@ -155,7 +158,7 @@ namespace Compatibility.Bridge
                 : new TransformationPromise<TSrc, TNew>(_source, LambdaCompositions.Compose(_evaluator, selector));
         }
 
-        public override Promise<TTar> CreateConditional(Expression<Func<TTar, bool>> predicate)
+        public override Promise<TTar> CreateCondition(Expression<Func<TTar, bool>> predicate)
         {
             if(predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
@@ -191,7 +194,7 @@ namespace Compatibility.Bridge
             return _cached;
         }
 
-        public override Promise<TNew> CreateNew<TNew>(Expression<Func<T, TNew>> selector)
+        public override Promise<TNew> CreateTransform<TNew>(Expression<Func<T, TNew>> selector)
         {
             if(selector is null)
                 throw new ArgumentNullException(nameof(selector));
@@ -199,7 +202,7 @@ namespace Compatibility.Bridge
             return new TransformationPromise<T, TNew>(_wasEvaluated ? (Promise<T>) new ResolvedPromise<T>(_cached) : this, selector);
         }
 
-        public override Promise<T> CreateConditional(Expression<Func<T, bool>> predicate)
+        public override Promise<T> CreateCondition(Expression<Func<T, bool>> predicate)
         {
             if(predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
@@ -240,11 +243,11 @@ namespace Compatibility.Bridge
             _source = task ?? throw new ArgumentNullException(nameof(task));
         }
 
-        public override Promise<TNew> CreateNew<TNew>(Expression<Func<TTar, TNew>> selector)
-            => new TransformationPromise<TTar, TNew>(this, selector);
+        public override Promise<TNew> CreateTransform<TNew>(Expression<Func<TTar, TNew>> selector)
+            => new TransformationPromise<TTar, TNew>(this, selector ?? throw  new ArgumentNullException(nameof(selector)));
 
-        public override Promise<TTar> CreateConditional(Expression<Func<TTar, bool>> predicate)
-            => new ConditionPromise<TTar>(this, predicate);
+        public override Promise<TTar> CreateCondition(Expression<Func<TTar, bool>> predicate)
+            => new ConditionPromise<TTar>(this, predicate ?? throw new ArgumentNullException(nameof(predicate)));
 
         public override Maybe<TTar> Evaluate()
         {
@@ -255,5 +258,89 @@ namespace Compatibility.Bridge
 
     }
 
-    
+    internal class FlattenPromise<TTar> : Promise<TTar>
+    {
+        internal struct Awaiter : IPromiseAwaiter<TTar>
+        {
+            private readonly FlattenPromise<TTar> _promise;
+            private IPromiseAwaiter _srcAwaiter;
+
+            public bool IsCompleted
+            {
+                get
+                {
+                    if (_promise._wasEvaluated)
+                        return true;
+                    if (_srcAwaiter is null)
+                        _srcAwaiter = _promise._source.GetAwaiter();
+
+                    if (_srcAwaiter.IsCompleted)
+                    {
+                        if (_srcAwaiter is IPromiseAwaiter<Promise<TTar>> nestedPromise)
+                            _srcAwaiter = nestedPromise.GetResult().Match()?.GetAwaiter() ??
+                                          throw new InvalidOperationException();
+                        return _srcAwaiter.IsCompleted;
+                    }
+
+                    return false;
+                }
+            }
+
+            public Awaiter(FlattenPromise<TTar> source)
+            {
+                _promise = source ?? throw new ArgumentNullException(nameof(source));
+                _srcAwaiter = null;
+            }
+
+            public Maybe<TTar> GetResult()
+            {
+                return _promise.Evaluate();
+            }
+
+            public void OnCompleted(Action continuation)
+            {
+                if (continuation is null)
+                    throw new ArgumentNullException(nameof(continuation));
+
+                if (IsCompleted)
+                    continuation();
+                else
+                    _srcAwaiter.OnCompleted(continuation);
+
+            }
+        }
+
+        private readonly Promise<LazyMaybe<TTar>> _source;
+        private Maybe<TTar> _cached;
+        private bool _wasEvaluated;
+        private FlattenPromise() { }
+
+        public FlattenPromise(Promise<LazyMaybe<TTar>> source)
+        {
+            _source = source ?? throw new ArgumentNullException(nameof(source));
+        }
+
+        public override Maybe<TTar> Evaluate()
+        {
+            if (_wasEvaluated)
+                return _cached;
+
+            _cached = _source.Evaluate().Match(LazyMaybe<TTar>.None).GetAwaiter().GetResult();
+            _wasEvaluated = true;
+            return _cached;
+        }
+
+        public override Promise<TNew> CreateTransform<TNew>(Expression<Func<TTar, TNew>> selector)
+            => new TransformationPromise<TTar, TNew>(
+                _wasEvaluated ? (Promise<TTar>) new ResolvedPromise<TTar>(_cached) : this,
+                selector ?? throw new ArgumentNullException(nameof(selector)));
+
+        public override Promise<TTar> CreateCondition(Expression<Func<TTar, bool>> predicate)
+            => new ConditionPromise<TTar>(
+                _wasEvaluated ? (Promise<TTar>)new ResolvedPromise<TTar>(_cached) : this,
+                predicate ?? throw new ArgumentNullException(nameof(predicate)));
+
+        public override IPromiseAwaiter<TTar> GetAwaiter() => new Awaiter(this);
+        
+    }
 }

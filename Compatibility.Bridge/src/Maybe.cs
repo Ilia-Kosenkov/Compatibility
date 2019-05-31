@@ -55,6 +55,9 @@ namespace Compatibility.Bridge
         public T Match(T @default = default)
             => _hasValue ? _value : @default;
 
+        public T Match<TExcept>(TExcept except) where TExcept : Exception
+            => _hasValue ? _value : throw ((Exception) except ?? new ArgumentNullException(nameof(except)));
+
         public TTarget Match<TTarget>(Func<T, TTarget> selector, TTarget @default = default)
         {
             if(selector is null)
