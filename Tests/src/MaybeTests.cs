@@ -20,7 +20,10 @@
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
 
+using System;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Xml.Schema;
 using Compatibility.Bridge;
 using Compatibility.Bridge.Internal;
 using NUnit.Framework;
@@ -35,8 +38,8 @@ namespace Tests
         public void Test_Linq()
         {
 
-            LazyMaybe<int> a = 5;
-            LazyMaybe<int> b = 0;
+            LazyMaybe<int> a = Some(5);
+            LazyMaybe<int> b = Some(0);
             LazyMaybe<int> c = None;
 
             var r1 = a.Select(x => x + 5).Select(y => y - 4).Select(z => z * z);
@@ -88,16 +91,31 @@ namespace Tests
         [Test]
         public void Test_Collections()
         {
-            
+            var r = new Random();
+
+            var bytes = new byte[32];
+            r.NextBytes(bytes);
+
+            var collection = bytes.SelectMaybeLazy<byte, int>(x => x).WhereMaybe(x => x > 200).ToList();
+
+            var result = collection.MatchMaybe(0).ToList();
 
         }
 
         [Test]
-        public void Test()
+        public async Task Test()
         {
-            var f = LambdaCompositions.Compose<int, int, int>(x => x + 5, y => -(y * y)).Compile();
+            var first = new LazyMaybe<int>(Task.Delay(6000).ContinueWith(x => new Maybe<int>(20)));
+            var second = new Maybe<int>(30);
 
-            var test = new[] {5, 10, 100}.Select(f).ToList();
+            first = first.Select(x => x / 10).Select(x => x + 1);
+            second = second.Select(x => x / 10).Select(x => x + 3);
+
+            var result = from x in await first
+                         from y in second
+                         select x * y;
+
+
         }
     }
 }

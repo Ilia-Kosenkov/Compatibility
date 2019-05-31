@@ -22,23 +22,47 @@
 
 using System;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Compatibility.Bridge
 {
     public sealed class LazyMaybe<T>
     {
+        public struct Awaiter : INotifyCompletion
+        {
+            private readonly IPromiseAwaiter<T> _awaiter;
+            public bool IsCompleted => _awaiter.IsCompleted;
+
+            internal Awaiter(Promise<T> source)
+            {
+                _awaiter = source?.GetAwaiter() ?? throw new ArgumentNullException(nameof(source));
+            }
+
+            public Maybe<T> GetResult() => _awaiter.GetResult();
+
+            public void OnCompleted(Action continuation)
+                => _awaiter.OnCompleted(continuation ?? throw new ArgumentNullException(nameof(continuation)));
+        }
+
         private readonly Promise<T> _promise;
 
         public static LazyMaybe<T> None { get; } = new LazyMaybe<T>();
 
         public LazyMaybe() => _promise = new ResolvedPromise<T>(Maybe<T>.None);
 
+        public LazyMaybe(T value)
+            => _promise = new ResolvedPromise<T>((Maybe<T>) value);
+
         public LazyMaybe(Maybe<T> value)
             => _promise = new ResolvedPromise<T>(value);
 
+        public LazyMaybe(Task<Maybe<T>> task)
+            => _promise = new AsyncPromise<T>(task);
+
         private LazyMaybe(Promise<T> promise)
             => _promise = promise;
-
+        
 
         public T Match(T @default = default)
             => _promise.Evaluate().Match(@default);
@@ -65,15 +89,15 @@ namespace Compatibility.Bridge
         public LazyMaybe<T> WhereLambda(Func<T, bool> predicate)
             => new LazyMaybe<T>(_promise.CreateConditional(x => predicate(x)));
 
-
+        public Awaiter GetAwaiter() => new Awaiter(_promise);
 
         public static explicit operator Maybe<T>(LazyMaybe<T> value)
             => value._promise.Evaluate();
 
-        public static explicit operator LazyMaybe<T>(Maybe<T> value)
+        public static implicit operator LazyMaybe<T>(Maybe<T> value)
             => new LazyMaybe<T>(value);
 
-        public static implicit operator LazyMaybe<T>(T value)
+        public static explicit operator LazyMaybe<T>(T value)
             => new LazyMaybe<T>(value);
 
         public static implicit operator LazyMaybe<T>(NoneType _)

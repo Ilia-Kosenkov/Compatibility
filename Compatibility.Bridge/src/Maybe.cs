@@ -79,7 +79,7 @@ namespace Compatibility.Bridge
 
         }
 
-        public static implicit operator Maybe<T> (T value)
+        public static explicit operator Maybe<T> (T value)
             => new Maybe<T>(value);
 
         public static implicit operator Maybe<T>(NoneType _)

@@ -21,23 +21,15 @@
 //     SOFTWARE.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 
 namespace Compatibility.Bridge
 {
     public static class MaybeExtensions
     {
-        public static Maybe<TTarget> Select<TSource, TTarget>(this TSource? @this, Func<TSource, TTarget> selector)
-            where TSource : struct
-            => selector is null
-                ? throw new ArgumentNullException(nameof(selector))
-                : @this is null
-                    ? new Maybe<TTarget>()
-                    : selector(@this.Value);
+        public static NoneType None => NoneType.None;
 
         public static Maybe<TResult> SelectMany<TSource, TSelection, TResult>(
             this Maybe<TSource> @this,
@@ -74,62 +66,84 @@ namespace Compatibility.Bridge
         public static Maybe<T> Some<T>(T @this)
             => @this == null
                 ? throw new ArgumentNullException(nameof(@this))
-                : @this;
+                : (Maybe<T>) @this;
 
-        public static NoneType None => NoneType.None;
+
+        public static IEnumerable<Maybe<TTarget>> SelectMaybe<TSource, TTarget>(this IEnumerable<TSource> @this,
+            Func<TSource, TTarget> selector)
+            where TSource : struct
+            => selector is null
+                ? throw new ArgumentNullException(nameof(selector))
+                : @this?.Select(x => new Maybe<TSource>(x).Select(selector));
+
+        public static IEnumerable<LazyMaybe<TTarget>> SelectMaybeLazy<TSource, TTarget>(this IEnumerable<TSource> @this,
+            Expression<Func<TSource, TTarget>> selector)
+            where TSource : struct
+            => selector is null
+                ? throw new ArgumentNullException(nameof(selector))
+                : @this?.Select(x => new LazyMaybe<TSource>(x).Select(selector));
+
+        public static IEnumerable<LazyMaybe<TTarget>> SelectMaybeLazyLambda<TSource, TTarget>(this IEnumerable<TSource> @this,
+            Func<TSource, TTarget> selector)
+            where TSource : struct
+            => selector is null
+                ? throw new ArgumentNullException(nameof(selector))
+                : @this?.Select(x => new LazyMaybe<TSource>(x).SelectLambda(selector));
+
 
         public static IEnumerable<Maybe<T>> WhereMaybe<T>(this IEnumerable<T> @this, Func<T, bool> predicate)
             => predicate is null
                 ? throw new ArgumentNullException(nameof(predicate))
-                : @this?.Select(item => predicate(item)
-                    ? item
-                    : Maybe<T>.None);
+                : @this?.Select(item => new Maybe<T>(item).Where(predicate));
 
-        public static IEnumerable<LazyMaybe<T>> WhereMaybeLazy<T>(this IEnumerable<T> @this, Func<T, bool> predicate)
+        public static IEnumerable<LazyMaybe<T>> WhereMaybeLazy<T>(this IEnumerable<T> @this, Expression<Func<T, bool>> predicate)
             => predicate is null
                 ? throw new ArgumentNullException(nameof(predicate))
-                : @this?.Select(item => predicate(item)
-                    ? item
-                    : LazyMaybe<T>.None);
+                : @this?.Select(item => new LazyMaybe<T>(item).Where(predicate));
 
-        public static IEnumerable<Maybe<TTar>> Select<TSrc, TTar>(this IEnumerable<Maybe<TSrc>> @this,
+        public static IEnumerable<LazyMaybe<T>> WhereMaybeLazyLambda<T>(this IEnumerable<T> @this, Func<T, bool> predicate)
+            => predicate is null
+                ? throw new ArgumentNullException(nameof(predicate))
+                : @this?.Select(item => new LazyMaybe<T>(item).WhereLambda(predicate));
+
+        public static IEnumerable<Maybe<TTar>> SelectMaybe<TSrc, TTar>(this IEnumerable<Maybe<TSrc>> @this,
             Func<TSrc, TTar> selector)
             => selector is null
                 ? throw new ArgumentNullException(nameof(selector))
                 : @this?.Select(x => x.Select(selector));
 
-        public static IEnumerable<LazyMaybe<TTar>> Select<TSrc, TTar>(this IEnumerable<LazyMaybe<TSrc>> @this,
+        public static IEnumerable<LazyMaybe<TTar>> SelectMaybe<TSrc, TTar>(this IEnumerable<LazyMaybe<TSrc>> @this,
             Expression<Func<TSrc, TTar>> selector)
             => selector is null
                 ? throw new ArgumentNullException(nameof(selector))
                 : @this?.Select(x => x.Select(selector));
 
-        public static IEnumerable<LazyMaybe<TTar>> SelectLambda<TSrc, TTar>(this IEnumerable<LazyMaybe<TSrc>> @this,
+        public static IEnumerable<LazyMaybe<TTar>> SelectMaybeLambda<TSrc, TTar>(this IEnumerable<LazyMaybe<TSrc>> @this,
             Func<TSrc, TTar> selector)
             => selector is null
                 ? throw new ArgumentNullException(nameof(selector))
                 : @this?.Select(x => x.SelectLambda(selector));
 
-        public static IEnumerable<Maybe<T>> Where<T>(this IEnumerable<Maybe<T>> @this, Func<T, bool> predicate)
+        public static IEnumerable<Maybe<T>> WhereMaybe<T>(this IEnumerable<Maybe<T>> @this, Func<T, bool> predicate)
             => predicate is null
                 ? throw new ArgumentNullException(nameof(predicate))
                 : @this?.Select(x => x.Where(predicate));
 
-        public static IEnumerable<LazyMaybe<T>> Where<T>(this IEnumerable<LazyMaybe<T>> @this, Expression<Func<T, bool>> predicate)
+        public static IEnumerable<LazyMaybe<T>> WhereMaybe<T>(this IEnumerable<LazyMaybe<T>> @this, Expression<Func<T, bool>> predicate)
             => predicate is null
                 ? throw new ArgumentNullException(nameof(predicate))
                 : @this?.Select(x => x.Where(predicate));
 
-        public static IEnumerable<LazyMaybe<T>> WhereLambda<T>(this IEnumerable<LazyMaybe<T>> @this, Func<T, bool> predicate)
+        public static IEnumerable<LazyMaybe<T>> WhereMaybeLambda<T>(this IEnumerable<LazyMaybe<T>> @this, Func<T, bool> predicate)
             => predicate is null
                 ? throw new ArgumentNullException(nameof(predicate))
                 : @this?.Select(x => x.WhereLambda(predicate));
 
 
-        public static IEnumerable<T> Match<T>(this IEnumerable<Maybe<T>> @this, T @default = default)
+        public static IEnumerable<T> MatchMaybe<T>(this IEnumerable<Maybe<T>> @this, T @default = default)
             => @this?.Select(x => x.Match(@default));
 
-        public static IEnumerable<T> Match<T>(this IEnumerable<LazyMaybe<T>> @this, T @default = default)
+        public static IEnumerable<T> MatchMaybe<T>(this IEnumerable<LazyMaybe<T>> @this, T @default = default)
             => @this?.Select(x => x.Match(@default));
 
     }
