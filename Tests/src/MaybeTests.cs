@@ -39,8 +39,8 @@ namespace Tests
         public void Test_Linq()
         {
 
-            Maybe<int> a = Some(5);
-            Maybe<int> b = Some(0);
+            Maybe<int> a = 5.Some();
+            Maybe<int> b = 0;
             Maybe<int> c = None.Get;
 
             var r1 = a.Select(x => x + 5).Select(y => y - 4).Select(z => z * z);

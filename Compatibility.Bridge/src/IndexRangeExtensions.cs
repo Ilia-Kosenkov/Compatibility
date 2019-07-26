@@ -21,6 +21,8 @@
 //     SOFTWARE.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Compatibility.Bridge
 {
@@ -99,5 +101,11 @@ namespace Compatibility.Bridge
 
         public static char Get(this string @this, Index at)
             => @this[at.GetOffset(@this.Length)];
+
+        public static T Get<T>(this T[] @this, Index at)
+            => (@this ?? throw new ArgumentNullException(nameof(@this)))[at.GetOffset(@this.Length)];
+
+        public static T Get<T>(this IList<T> @this, Index at)
+            => (@this ?? throw new ArgumentNullException(nameof(@this)))[at.GetOffset(@this.Count)];
     }
 }

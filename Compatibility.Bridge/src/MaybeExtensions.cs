@@ -42,10 +42,8 @@ namespace Compatibility.Bridge
         }
 
   
-        public static Maybe<T> Some<T>(T @this)
-            => @this == null
-                ? throw new ArgumentNullException(nameof(@this))
-                : (Maybe<T>) @this;
+        public static Maybe<T> Some<T>(this T @this)
+            => new Maybe<T>(@this);
 
 
         public static IEnumerable<Maybe<TTarget>> SelectMaybe<TSource, TTarget>(this IEnumerable<TSource> @this,
@@ -74,6 +72,20 @@ namespace Compatibility.Bridge
     
         public static IEnumerable<T> Match<T>(this IEnumerable<Maybe<T>> @this, T @default = default)
             => @this?.Select(x => x.Match(@default));
+
+        public static Maybe<T> FirstOrNone<T>(this IEnumerable<T> @this, Func<T, bool> predicate)
+        {
+            if (@this is null)
+                throw new ArgumentNullException(nameof(@this));
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            foreach (var item in @this)
+                if (predicate(item))
+                    return item;
+
+            return Maybe<T>.None;
+        }
 
     }
 }
