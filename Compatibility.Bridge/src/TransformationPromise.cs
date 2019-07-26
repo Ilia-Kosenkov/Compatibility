@@ -94,7 +94,7 @@ namespace Compatibility.Bridge
             {
                 get
                 {
-                    if (_promise._wasEvaluated)
+                    if (_promise._cached != null)
                         return true;
                     _srcAwaiter = _srcAwaiter ?? _promise._source.GetAwaiter();
                     return _srcAwaiter.IsCompleted;
@@ -129,7 +129,6 @@ namespace Compatibility.Bridge
         private readonly Promise<TSrc> _source;
         private readonly Expression<Func<TSrc, TTar>> _evaluator;
         private Maybe<TTar> _cached;
-        private bool _wasEvaluated;
 
         public TransformationPromise(Promise<TSrc> source, Expression<Func<TSrc, TTar>> evaluator)
         {
@@ -138,24 +137,16 @@ namespace Compatibility.Bridge
         }
 
         public override Maybe<TTar> Evaluate()
-        {
-            if (_wasEvaluated)
-                return _cached;
-
-            _cached = _source.Evaluate().Select(_evaluator.Compile());
-            _wasEvaluated = true;
-
-            return _cached;
-        }
+            => _cached ?? (_cached = _source.Evaluate().Select(_evaluator.Compile()));
 
         public override Promise<TNew> CreateTransform<TNew>(Expression<Func<TTar, TNew>> selector)
         {
             if (selector is null)
                 throw new ArgumentNullException(nameof(selector));
 
-            return _wasEvaluated
-                ? (Promise<TNew>) new TransformationPromise<TTar, TNew>(new ResolvedPromise<TTar>(_cached), selector)
-                : new TransformationPromise<TSrc, TNew>(_source, LambdaCompositions.Compose(_evaluator, selector));
+            return _cached is null
+                ? new TransformationPromise<TSrc, TNew>(_source, LambdaCompositions.Compose(_evaluator, selector))
+                : (Promise<TNew>) new TransformationPromise<TTar, TNew>(new ResolvedPromise<TTar>(_cached), selector);
         }
 
         public override Promise<TTar> CreateCondition(Expression<Func<TTar, bool>> predicate)
@@ -164,7 +155,7 @@ namespace Compatibility.Bridge
                 throw new ArgumentNullException(nameof(predicate));
 
             return new ConditionPromise<TTar>(
-                _wasEvaluated ? (Promise<TTar>) new ResolvedPromise<TTar>(_cached) : this, predicate);
+                _cached is null ? this : (Promise<TTar>) new ResolvedPromise<TTar>(_cached), predicate);
         }
 
         public override IPromiseAwaiter<TTar> GetAwaiter() => new Awaiter(this);
@@ -172,10 +163,50 @@ namespace Compatibility.Bridge
 
     internal class ConditionPromise<T> : Promise<T>
     {
+        internal struct Awaiter : IPromiseAwaiter<T>
+        {
+            private readonly ConditionPromise<T> _promise;
+            private IPromiseAwaiter<T> _srcAwaiter;
+
+            public bool IsCompleted
+            {
+                get
+                {
+                    if (_promise._cached != null)
+                        return true;
+                    _srcAwaiter = _srcAwaiter ?? _promise._source.GetAwaiter();
+                    return _srcAwaiter.IsCompleted;
+                }
+            }
+
+            public Awaiter(ConditionPromise<T> source)
+            {
+                _promise = source ?? throw new ArgumentNullException(nameof(source));
+                _srcAwaiter = null;
+            }
+
+            public Maybe<T> GetResult()
+            {
+                return _promise.Evaluate();
+            }
+
+            public void OnCompleted(Action continuation)
+            {
+                if (continuation is null)
+                    throw new ArgumentNullException(nameof(continuation));
+
+                if (IsCompleted)
+                    continuation();
+                else
+                    _srcAwaiter.OnCompleted(continuation);
+
+            }
+        }
+
+
         private readonly Promise<T> _source;
         private readonly Expression<Func<T, bool>> _predicate;
         private Maybe<T> _cached;
-        private bool _wasEvaluated;
 
         public ConditionPromise(Promise<T> source, Expression<Func<T, bool>> predicate)
         {
@@ -184,22 +215,15 @@ namespace Compatibility.Bridge
         }
 
         public override Maybe<T> Evaluate()
-        {
-            if (_wasEvaluated)
-                return _cached;
-
-            _cached = _source.Evaluate().Where(_predicate.Compile());
-            _wasEvaluated = true;
-
-            return _cached;
-        }
+            => _cached ?? (_cached = _source.Evaluate().Where(_predicate.Compile()));
 
         public override Promise<TNew> CreateTransform<TNew>(Expression<Func<T, TNew>> selector)
         {
             if(selector is null)
                 throw new ArgumentNullException(nameof(selector));
 
-            return new TransformationPromise<T, TNew>(_wasEvaluated ? (Promise<T>) new ResolvedPromise<T>(_cached) : this, selector);
+            return new TransformationPromise<T, TNew>(
+                _cached is null ? this : (Promise<T>) new ResolvedPromise<T>(_cached), selector);
         }
 
         public override Promise<T> CreateCondition(Expression<Func<T, bool>> predicate)
@@ -207,15 +231,12 @@ namespace Compatibility.Bridge
             if(predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
 
-            return _wasEvaluated
-                ? new ConditionPromise<T>(new ResolvedPromise<T>(_cached), predicate)
-                : new ConditionPromise<T>(_source, LambdaCompositions.ComposePredicatesAnd(_predicate, predicate));
+            return _cached is null
+                ? new ConditionPromise<T>(_source, LambdaCompositions.ComposePredicatesAnd(_predicate, predicate))
+                : new ConditionPromise<T>(new ResolvedPromise<T>(_cached), predicate);
         }
 
-        public override IPromiseAwaiter<T> GetAwaiter()
-        {
-            throw new NotImplementedException();
-        }
+        public override IPromiseAwaiter<T> GetAwaiter() => new ConditionPromise<T>.Awaiter(this);
     }
 
     internal class AsyncPromise<TTar> : Promise<TTar>
@@ -236,7 +257,6 @@ namespace Compatibility.Bridge
         }
 
         private readonly Task<Maybe<TTar>> _source;
-        private AsyncPromise() { }
 
         public AsyncPromise(Task<Maybe<TTar>> task)
         {
@@ -251,7 +271,7 @@ namespace Compatibility.Bridge
 
         public override Maybe<TTar> Evaluate()
         {
-            return (Maybe<TTar>)_source.GetAwaiter().GetResult();
+            return _source.GetAwaiter().GetResult();
         }
 
         public override IPromiseAwaiter<TTar> GetAwaiter() => new Awaiter(_source);
@@ -269,7 +289,7 @@ namespace Compatibility.Bridge
             {
                 get
                 {
-                    if (_promise._wasEvaluated)
+                    if (_promise._cached != null)
                         return true;
                     if (_srcAwaiter is null)
                         _srcAwaiter = _promise._source.GetAwaiter();
@@ -312,8 +332,6 @@ namespace Compatibility.Bridge
 
         private readonly Promise<LazyMaybe<TTar>> _source;
         private Maybe<TTar> _cached;
-        private bool _wasEvaluated;
-        private FlattenPromise() { }
 
         public FlattenPromise(Promise<LazyMaybe<TTar>> source)
         {
@@ -321,23 +339,16 @@ namespace Compatibility.Bridge
         }
 
         public override Maybe<TTar> Evaluate()
-        {
-            if (_wasEvaluated)
-                return _cached;
-
-            _cached = _source.Evaluate().Match(LazyMaybe<TTar>.None).GetAwaiter().GetResult();
-            _wasEvaluated = true;
-            return _cached;
-        }
+            => _cached ?? (_cached = _source.Evaluate().Match(LazyMaybe<TTar>.None).GetAwaiter().GetResult());
 
         public override Promise<TNew> CreateTransform<TNew>(Expression<Func<TTar, TNew>> selector)
             => new TransformationPromise<TTar, TNew>(
-                _wasEvaluated ? (Promise<TTar>) new ResolvedPromise<TTar>(_cached) : this,
+                _cached is null ? this : (Promise<TTar>) new ResolvedPromise<TTar>(_cached),
                 selector ?? throw new ArgumentNullException(nameof(selector)));
 
         public override Promise<TTar> CreateCondition(Expression<Func<TTar, bool>> predicate)
             => new ConditionPromise<TTar>(
-                _wasEvaluated ? (Promise<TTar>)new ResolvedPromise<TTar>(_cached) : this,
+                _cached is null ? this : (Promise<TTar>)new ResolvedPromise<TTar>(_cached),
                 predicate ?? throw new ArgumentNullException(nameof(predicate)));
 
         public override IPromiseAwaiter<TTar> GetAwaiter() => new Awaiter(this);

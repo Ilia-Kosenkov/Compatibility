@@ -23,6 +23,7 @@
 using System;
 using System.Linq;
 using System.Security.AccessControl;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Schema;
 using Compatibility.Bridge;
@@ -96,7 +97,6 @@ namespace Tests
 
             var bytes = new byte[32];
             r.NextBytes(bytes);
-
             var collection = bytes.SelectMaybeLazy<byte, int>(x => x).WhereMaybe(x => x > 200).ToList();
 
             var result = collection.MatchMaybe(0).ToList();
@@ -109,14 +109,14 @@ namespace Tests
             var temp = new LazyMaybe<LazyMaybe<int>>(new LazyMaybe<int>(5));
 
             var n = await from x in temp
-                    from y in x
-                    from z in Some(23)
-                    select y + z;
+                          from y in x
+                          from z in Some(23)
+                          select y + z;
 
             Assert.That(() => n.Match(new Exception()), Throws.Nothing);
 
-            var first = new LazyMaybe<int>(Task.Delay(2000).ContinueWith(x => new Maybe<int>(20)));
-            var second = new LazyMaybe<int>(Task.Delay(4000).ContinueWith(x => new Maybe<int>(30)));
+            var first = new LazyMaybe<int>(Task.Delay(1000).ContinueWith(x => new Maybe<int>(20)));
+            var second = new LazyMaybe<int>(Task.Delay(2000).ContinueWith(x => new Maybe<int>(30)));
 
             first = first.Select(x => x / 10).Select(x => x + 1);
             second = second.Select(x => x / 10).Select(x => x + 3);
@@ -129,6 +129,22 @@ namespace Tests
             var result = await delayedResult;
 
             Assert.That(delayedResult.Match(-1), Is.EqualTo(18));
+
+        }
+
+        [Test]
+        public async Task Example()
+        {
+            var x = new LazyMaybe<int>(Task.Run(() => Some(42)));
+            var y = Some(21);
+
+            var result = await from i in x
+                               from j in y
+                               where i > 40
+                               where j > 20
+                               select i / j;
+
+            Assert.That(result.Match(0), Is.EqualTo(2));
         }
     }
 }
