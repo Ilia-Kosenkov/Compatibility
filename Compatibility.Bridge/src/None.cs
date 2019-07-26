@@ -22,8 +22,10 @@
 
 namespace Compatibility.Bridge
 {
-    public sealed class NoneType
+    public sealed class None : Maybe
     {
-        public static NoneType None { get; } = new NoneType();
+        public static None Get { get; } = new None();
+
+        private None() { }
     }
 }

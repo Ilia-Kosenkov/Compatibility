@@ -23,14 +23,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace Compatibility.Bridge
 {
     public static class MaybeExtensions
     {
-        public static NoneType None => NoneType.None;
-
         public static Maybe<TResult> SelectMany<TSource, TSelection, TResult>(
             this Maybe<TSource> @this,
             Func<TSource, Maybe<TSelection>> mapper,
@@ -41,66 +38,10 @@ namespace Compatibility.Bridge
             if(selector is null)
                 throw new ArgumentNullException(nameof(selector));
 
-            if(@this is null)
-                return new Maybe<TResult>();
-
-            return @this.Match(x => mapper(x).Select(y => selector(x, y)), None);
+            return @this is null ? new Maybe<TResult>() : @this.Match(x => mapper(x).Select(y => selector(x, y)), None.Get);
         }
 
-        public static LazyMaybe<TResult> SelectMany<TSource, TSelection, TResult>(
-            this Maybe<TSource> @this,
-            Func<TSource, LazyMaybe<TSelection>> mapper,
-            Func<TSource, TSelection, TResult> selector)
-        {
-            if (mapper is null)
-                throw new ArgumentNullException(nameof(mapper));
-            if (selector is null)
-                throw new ArgumentNullException(nameof(selector));
-
-            if (@this is null)
-                return new Maybe<TResult>();
-
-            var temp = (LazyMaybe<LazyMaybe<TResult>>)@this.Select(x => mapper(x).Select(y => selector(x, y)));
-
-            return LazyMaybe<TResult>.Flatten(temp);
-        }
-
-        public static LazyMaybe<TResult> SelectMany<TSource, TSelection, TResult>(
-            this LazyMaybe<TSource> @this,
-            Func<TSource, Maybe<TSelection>> mapper,
-            Func<TSource, TSelection, TResult> selector)
-        {
-            if (mapper is null)
-                throw new ArgumentNullException(nameof(mapper));
-            if (selector is null)
-                throw new ArgumentNullException(nameof(selector));
-
-            if (@this is null)
-                return new Maybe<TResult>();
-
-            var temp = @this.Select(x => (LazyMaybe<TResult>)mapper(x).Select(y => selector(x, y)));
-
-            return LazyMaybe<TResult>.Flatten(temp);
-        }
-
-        public static LazyMaybe<TResult> SelectMany<TSource, TSelection, TResult>(
-            this LazyMaybe<TSource> @this,
-            Func<TSource, LazyMaybe<TSelection>> mapper,
-            Func<TSource, TSelection, TResult> selector)
-        {
-            if (mapper is null)
-                throw new ArgumentNullException(nameof(mapper));
-            if (selector is null)
-                throw new ArgumentNullException(nameof(selector));
-
-            if (@this is null)
-                return new LazyMaybe<TResult>();
-
-            var temp = @this.Select(x => mapper(x).Select(y => selector(x, y)));
-
-            return LazyMaybe<TResult>.Flatten(temp);
-        }
-
+  
         public static Maybe<T> Some<T>(T @this)
             => @this == null
                 ? throw new ArgumentNullException(nameof(@this))
@@ -114,74 +55,24 @@ namespace Compatibility.Bridge
                 ? throw new ArgumentNullException(nameof(selector))
                 : @this?.Select(x => new Maybe<TSource>(x).Select(selector));
 
-        public static IEnumerable<LazyMaybe<TTarget>> SelectMaybeLazyExpression<TSource, TTarget>(this IEnumerable<TSource> @this,
-            Expression<Func<TSource, TTarget>> selector)
-            where TSource : struct
-            => selector is null
-                ? throw new ArgumentNullException(nameof(selector))
-                : @this?.Select(x => new LazyMaybe<TSource>(x).SelectExpression(selector));
-
-        public static IEnumerable<LazyMaybe<TTarget>> SelectMaybeLazy<TSource, TTarget>(this IEnumerable<TSource> @this,
-            Func<TSource, TTarget> selector)
-            where TSource : struct
-            => selector is null
-                ? throw new ArgumentNullException(nameof(selector))
-                : @this?.Select(x => new LazyMaybe<TSource>(x).Select(selector));
-
-
         public static IEnumerable<Maybe<T>> WhereMaybe<T>(this IEnumerable<T> @this, Func<T, bool> predicate)
             => predicate is null
                 ? throw new ArgumentNullException(nameof(predicate))
                 : @this?.Select(item => new Maybe<T>(item).Where(predicate));
 
-        public static IEnumerable<LazyMaybe<T>> WhereMaybeLazyExpression<T>(this IEnumerable<T> @this, Expression<Func<T, bool>> predicate)
-            => predicate is null
-                ? throw new ArgumentNullException(nameof(predicate))
-                : @this?.Select(item => new LazyMaybe<T>(item).WhereExpression(predicate));
-
-        public static IEnumerable<LazyMaybe<T>> WhereMaybeLazy<T>(this IEnumerable<T> @this, Func<T, bool> predicate)
-            => predicate is null
-                ? throw new ArgumentNullException(nameof(predicate))
-                : @this?.Select(item => new LazyMaybe<T>(item).Where(predicate));
-
-        public static IEnumerable<Maybe<TTar>> SelectMaybe<TSrc, TTar>(this IEnumerable<Maybe<TSrc>> @this,
+       public static IEnumerable<Maybe<TTar>> Select<TSrc, TTar>(this IEnumerable<Maybe<TSrc>> @this,
             Func<TSrc, TTar> selector)
             => selector is null
                 ? throw new ArgumentNullException(nameof(selector))
                 : @this?.Select(x => x.Select(selector));
 
-        public static IEnumerable<LazyMaybe<TTar>> SelectMaybeExpression<TSrc, TTar>(this IEnumerable<LazyMaybe<TSrc>> @this,
-            Expression<Func<TSrc, TTar>> selector)
-            => selector is null
-                ? throw new ArgumentNullException(nameof(selector))
-                : @this?.Select(x => x.SelectExpression(selector));
-
-        public static IEnumerable<LazyMaybe<TTar>> SelectMaybe<TSrc, TTar>(this IEnumerable<LazyMaybe<TSrc>> @this,
-            Func<TSrc, TTar> selector)
-            => selector is null
-                ? throw new ArgumentNullException(nameof(selector))
-                : @this?.Select(x => x.Select(selector));
-
-        public static IEnumerable<Maybe<T>> WhereMaybe<T>(this IEnumerable<Maybe<T>> @this, Func<T, bool> predicate)
+        public static IEnumerable<Maybe<T>> Where<T>(this IEnumerable<Maybe<T>> @this, Func<T, bool> predicate)
             => predicate is null
                 ? throw new ArgumentNullException(nameof(predicate))
                 : @this?.Select(x => x.Where(predicate));
 
-        public static IEnumerable<LazyMaybe<T>> WhereMaybeExpression<T>(this IEnumerable<LazyMaybe<T>> @this, Expression<Func<T, bool>> predicate)
-            => predicate is null
-                ? throw new ArgumentNullException(nameof(predicate))
-                : @this?.Select(x => x.WhereExpression(predicate));
-
-        public static IEnumerable<LazyMaybe<T>> WhereMaybe<T>(this IEnumerable<LazyMaybe<T>> @this, Func<T, bool> predicate)
-            => predicate is null
-                ? throw new ArgumentNullException(nameof(predicate))
-                : @this?.Select(x => x.Where(predicate));
-
-
-        public static IEnumerable<T> MatchMaybe<T>(this IEnumerable<Maybe<T>> @this, T @default = default)
-            => @this?.Select(x => x.Match(@default));
-
-        public static IEnumerable<T> MatchMaybe<T>(this IEnumerable<LazyMaybe<T>> @this, T @default = default)
+    
+        public static IEnumerable<T> Match<T>(this IEnumerable<Maybe<T>> @this, T @default = default)
             => @this?.Select(x => x.Match(@default));
 
     }

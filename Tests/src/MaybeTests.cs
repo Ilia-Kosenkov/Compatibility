@@ -27,7 +27,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Schema;
 using Compatibility.Bridge;
-using Compatibility.Bridge.Internal;
 using NUnit.Framework;
 
 namespace Tests
@@ -40,9 +39,9 @@ namespace Tests
         public void Test_Linq()
         {
 
-            LazyMaybe<int> a = Some(5);
-            LazyMaybe<int> b = Some(0);
-            LazyMaybe<int> c = None;
+            Maybe<int> a = Some(5);
+            Maybe<int> b = Some(0);
+            Maybe<int> c = None.Get;
 
             var r1 = a.Select(x => x + 5).Select(y => y - 4).Select(z => z * z);
             var r2 = b.Select(x => x + 5).Select(y => y - 4).Select(z => z * z);
@@ -77,17 +76,23 @@ namespace Tests
                 return x <= 100;
             }
 
-            var a = new LazyMaybe<int>(50);
-            var b = new LazyMaybe<int>(100);
-            var c = new LazyMaybe<int>(150);
+            var a = new Maybe<int>(50);
+            var b = new Maybe<int>(100);
+            var c = new Maybe<int>(150);
 
-            a = a.Where(Tester).WhereExpression(x => x > 60);
-            b = b.Where(Tester).WhereExpression(x => x > 60);
-            c = c.Where(Tester).WhereExpression(x => x > 60);
+            a = a.Where(Tester).Where(x => x > 60);
+            b = b.Where(Tester).Where(x => x > 60);
+            c = c.Where(Tester).Where(x => x > 60);
 
             var aa = a.Match(-1);
             var bb = b.Match(-1);
             var cc = c.Match(-1);
+
+            Assert.That(aa, Is.EqualTo(-1));
+            Assert.That(bb, Is.EqualTo(100));
+            Assert.That(cc, Is.EqualTo(-1));
+
+
         }
 
         [Test]
@@ -97,54 +102,13 @@ namespace Tests
 
             var bytes = new byte[32];
             r.NextBytes(bytes);
-            var collection = bytes.SelectMaybeLazy<byte, int>(x => x).WhereMaybe(x => x > 200).ToList();
+            var collection = bytes.SelectMaybe<byte, int>(x => x).Where(x => x > 200).ToList();
 
-            var result = collection.MatchMaybe(0).ToList();
+            var result = collection.Match(200).ToList();
 
+            foreach(var item in result)
+                Assert.That(item, Is.GreaterThanOrEqualTo(200));
         }
 
-        [Test]
-        public async Task Test()
-        {
-            var temp = new LazyMaybe<LazyMaybe<int>>(new LazyMaybe<int>(5));
-
-            var n = await from x in temp
-                          from y in x
-                          from z in Some(23)
-                          select y + z;
-
-            Assert.That(() => n.Match(new Exception()), Throws.Nothing);
-
-            var first = new LazyMaybe<int>(Task.Delay(1000).ContinueWith(x => new Maybe<int>(20)));
-            var second = new LazyMaybe<int>(Task.Delay(2000).ContinueWith(x => new Maybe<int>(30)));
-
-            first = first.Select(x => x / 10).Select(x => x + 1);
-            second = second.Select(x => x / 10).Select(x => x + 3);
-
-            var delayedResult = 
-                from x in first
-                from y in second
-                select x * y;
-
-            var result = await delayedResult;
-
-            Assert.That(delayedResult.Match(-1), Is.EqualTo(18));
-
-        }
-
-        [Test]
-        public async Task Example()
-        {
-            var x = new LazyMaybe<int>(Task.Run(() => Some(42)));
-            var y = Some(21);
-
-            var result = await from i in x
-                               from j in y
-                               where i > 40
-                               where j > 20
-                               select i / j;
-
-            Assert.That(result.Match(0), Is.EqualTo(2));
-        }
     }
 }

@@ -24,6 +24,8 @@ using System;
 
 namespace Compatibility.Bridge
 {
+
+    public abstract class Maybe { }
     public sealed class Maybe<T>
     {
         public static Maybe<T> None { get; } = new Maybe<T>();
@@ -85,7 +87,7 @@ namespace Compatibility.Bridge
         public static implicit operator Maybe<T> (T value)
             => new Maybe<T>(value);
 
-        public static implicit operator Maybe<T>(NoneType _)
+        public static implicit operator Maybe<T>(None _)
             => new Maybe<T>();
     }
 }
