@@ -26,7 +26,7 @@ namespace Compatibility.Bridge
 {
 
     public abstract class Maybe { }
-    public sealed class Maybe<T>
+    public sealed class Maybe<T> : Maybe
     {
         public static Maybe<T> None { get; } = new Maybe<T>();
 
