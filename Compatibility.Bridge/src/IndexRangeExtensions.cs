@@ -21,13 +21,37 @@
 //     SOFTWARE.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Compatibility.Bridge
 {
     public static class IndexRangeExtensions
     {
+        public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[] array, Range range)
+        {
+            var (offset, length) =
+                range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
+            return new ReadOnlySpan<T>(array, offset, length);
+        }
+        public static ReadOnlyMemory<T> AsReadOnlyMemory<T>(this T[] array, Range range)
+        {
+            var (offset, length) =
+                range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
+            return new ReadOnlyMemory<T>(array, offset, length);
+        }
+        public static Span<T> AsSpan<T>(this T[] array, Range range)
+        {
+            var (offset, length) =
+                range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
+            return new Span<T>(array, offset, length);
+        }
+        public static Memory<T> AsMemory<T>(this T[] array, Range range)
+        {
+            var (offset, length) =
+                range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
+            return new Memory<T>(array, offset, length);
+        }
+
         public static Span<T> Slice<T>(this Span<T> @this, Range range)
         {
             var (offset, length) = range.GetOffsetAndLength(@this.Length);
@@ -92,6 +116,47 @@ namespace Compatibility.Bridge
                 && end > start
                 && end <= length;
         }
+
+        public static bool IsValidRange(this Range @this, int length,
+            out Range.OffsetAndLength offset)
+        {
+            if (length <= 0)
+                throw new ArgumentException("Length should be positive", nameof(length));
+            offset = default;
+
+            var start = @this.Start.GetOffset(length);
+            if (start < 0 || start >= length)
+                return false;
+
+            var end = @this.End.GetOffset(length);
+            if (end <= start || end > length)
+                return false;
+
+            offset = new Range.OffsetAndLength(start, end - start);
+            return true;
+        }
+
+        public static Maybe<Range.OffsetAndLength> MaybeValid(this Range @this, int length)
+        {
+            if (length <= 0)
+                return Maybe<Range.OffsetAndLength>.None;
+
+            var start = @this.Start.GetOffset(length);
+            if (start < 0 || start >= length)
+                return Maybe<Range.OffsetAndLength>.None;
+
+            var end = @this.End.GetOffset(length);
+            if (end <= start || end > length)
+                return Maybe<Range.OffsetAndLength>.None;
+
+            return new Range.OffsetAndLength(start, end - start);
+        }
+
+        public static T Get<T>(this ReadOnlyMemory<T> @this, Index at)
+            => @this.Span[at.GetOffset(@this.Length)];
+
+        public static T Get<T>(this Memory<T> @this, Index at)
+            => @this.Span[at.GetOffset(@this.Length)];
 
         public static T Get<T>(this ReadOnlySpan<T> @this, Index at)
             => @this[at.GetOffset(@this.Length)];
