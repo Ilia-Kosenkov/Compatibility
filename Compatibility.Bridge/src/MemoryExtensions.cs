@@ -23,7 +23,6 @@
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Compatibility.Bridge
 {
@@ -31,13 +30,10 @@ namespace Compatibility.Bridge
     {
         public static ReadOnlyMemory<T> AsReadOnlyMemory<T>(this T[] array)
             => (ReadOnlyMemory<T>) array;
-
         public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[] array)
             => (ReadOnlySpan<T>) array;
-
         public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[] array, int start, int length)
             => new ReadOnlySpan<T>(array, start, length);
-
         public static ReadOnlyMemory<T> AsReadOnlyMemory<T>(this T[] array, int start, int length)
             => new ReadOnlyMemory<T>(array, start, length);
 
@@ -113,51 +109,6 @@ namespace Compatibility.Bridge
                     return false;
 
             return true;
-        }
-
-        public static unsafe int GetCharCount(this Encoding encoding, ReadOnlySpan<byte> bytes)
-        {
-            if (bytes.IsEmpty)
-                return 0;
-            fixed (byte* ptr = &bytes.GetPinnableReference())
-            {
-                return encoding.GetCharCount(ptr, bytes.Length);
-            }
-        }
-
-        public static unsafe int GetCharCount(this Encoding encoding, ReadOnlyMemory<byte> bytes)
-        {
-            if (bytes.IsEmpty)
-                return 0;
-            using (var handle = bytes.Pin())
-            {
-                return encoding.GetCharCount((byte*)handle.Pointer, bytes.Length);
-            }
-        }
-
-        public static unsafe int GetChars(this Encoding encoding, ReadOnlySpan<byte> bytes, Span<char> chars)
-        {
-            if (bytes.IsEmpty)
-                return 0;
-
-            fixed (byte* dataPtr = &bytes.GetPinnableReference())
-                fixed (char* strPtr = &chars.GetPinnableReference())
-                {
-                    return encoding.GetChars(dataPtr, bytes.Length, strPtr, chars.Length);
-                }
-        }
-
-        public static unsafe int GetChars(this Encoding encoding, ReadOnlyMemory<byte> bytes, Memory<char> chars)
-        {
-            if (bytes.IsEmpty)
-                return 0;
-
-            using (var dataHandle = bytes.Pin())
-                using (var strHandle = chars.Pin())
-                {
-                    return encoding.GetChars((byte*) dataHandle.Pointer, bytes.Length, (char*) strHandle.Pointer,
-                        chars.Length);
-                }
         }
 
         public static unsafe ReadOnlySpan<T> AsReadOnlySpanUnsafe<T>(this Span<T> @this)
