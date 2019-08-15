@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 
 namespace Compatibility.Bridge
 {
@@ -172,5 +173,62 @@ namespace Compatibility.Bridge
 
         public static T Get<T>(this IList<T> @this, Index at)
             => (@this ?? throw new ArgumentNullException(nameof(@this)))[at.GetOffset(@this.Count)];
+
+        public static Index Add(this Index i1, Index i2, int length)
+        {
+            if (length <= 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
+
+            var pos1 = i1.GetOffset(length);
+            var pos2 = i2.GetOffset(length);
+
+            var sum = pos1 + pos2;
+
+            if(sum >= 0 && sum <= length)
+                return new Index(sum);
+
+            throw new IndexOutOfRangeException();
+        }
+
+        public static Index Subtract(this Index i1, Index i2, int length)
+        {
+            if (length <= 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
+
+            var pos1 = i1.GetOffset(length);
+            var pos2 = i2.GetOffset(length);
+
+            var diff = pos1 - pos2;
+
+            if (diff >= 0 && diff <= length)
+                return new Index(diff);
+
+            throw new IndexOutOfRangeException();
+        }
+
+        public static Index Multiply(this Index i, int m, int length)
+        {
+            if (length <= 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
+
+            var pos = i.GetOffset(length);
+
+            var newVal = pos * m;
+
+            if (newVal >= 0 && newVal <= length)
+                return new Index(newVal);
+
+            throw new IndexOutOfRangeException();
+        }
+
+        public static bool IsStart(this Index i, int length)
+            => i.IsFromEnd
+                ? i.GetOffset(length) == 0
+                : i.Value == 0;
+
+        public static bool IsEnd(this Index i, int length)
+            => i.IsFromEnd
+                ? i.Value == 0
+                : i.GetOffset(length) == length;
     }
 }
