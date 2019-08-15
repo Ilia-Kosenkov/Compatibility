@@ -22,7 +22,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 
 namespace Compatibility.Bridge
 {
@@ -230,5 +229,44 @@ namespace Compatibility.Bridge
             => i.IsFromEnd
                 ? i.Value == 0
                 : i.GetOffset(length) == length;
+
+        public static Range SliceFromStart(this Range rng, int size, int length)
+        {
+            if (length <= 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
+            if (size < 0)
+                throw new ArgumentOutOfRangeException(nameof(size));
+
+            return new Range(rng.Start, rng.Start.Add(size, length));
+        }
+
+        public static Range SliceFromEnd(this Range rng, int size, int length)
+        {
+            if (length <= 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
+            if (size < 0)
+                throw new ArgumentOutOfRangeException(nameof(size));
+
+            return new Range(rng.End.Subtract(size, length), rng.End);
+        }
+
+        public static Range RangeFrom(this Index i, int size, int length)
+        {
+            if (length <= 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
+            if (size < 0)
+                throw new ArgumentOutOfRangeException(nameof(size));
+
+            return new Range(i, i.Add(size, length));
+        }
+
+        public static Range RangeTo(this Index i, int size, int length)
+        {
+            if (length <= 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
+            if (size < 0)
+                throw new ArgumentOutOfRangeException(nameof(size));
+            return new Range(i.Subtract(size, length), i);
+        }
     }
 }
