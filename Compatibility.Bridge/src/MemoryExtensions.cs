@@ -110,10 +110,7 @@ namespace Compatibility.Bridge
 
             return true;
         }
-
-        public static unsafe ReadOnlySpan<T> AsReadOnlySpanUnsafe<T>(this Span<T> @this)
-            => new ReadOnlySpan<T>(Unsafe.AsPointer(ref @this.GetPinnableReference()), @this.Length);
-
+        
         public static ReadOnlyMemory<char> Trim(this ReadOnlyMemory<char> @this)
         {
             if(@this.IsEmpty)
@@ -175,6 +172,10 @@ namespace Compatibility.Bridge
                 : @this.Slice(range);
         }
 
-       
+        public static bool SequenceEqual<T>(this ReadOnlyMemory<T> src, ReadOnlyMemory<T> tar) where T:IEquatable<T>
+            => src.Span.SequenceEqual(tar.Span);
+
+        public static bool SequenceEqual<T>(this Memory<T> src, ReadOnlyMemory<T> tar) where T : IEquatable<T>
+            => src.Span.SequenceEqual(tar.Span);
     }
 }
