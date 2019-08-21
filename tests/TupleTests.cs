@@ -63,6 +63,16 @@ namespace Tests
 
             for (var i = 0; i < cuT.Length; i++)
                 Assert.AreEqual(cuT[i], sysT[i]);
+
+            Assert.That(() => cuT[-1], Throws.InstanceOf<IndexOutOfRangeException>());
+            Assert.That(() => cuT[cuT.Length], Throws.InstanceOf<IndexOutOfRangeException>());
+        }
+
+        [Test]
+        public void Test_Fails()
+        {
+            Assert.IsNull(((object)null).IsValueTuple());
+            Assert.IsNull(5.IsValueTuple());
         }
     }
 
