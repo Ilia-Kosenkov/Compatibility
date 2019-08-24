@@ -22,7 +22,6 @@
 
 using System;
 using System.Linq;
-using System.Security.Policy;
 using Maybe;
 using NUnit.Framework;
 
@@ -122,5 +121,33 @@ namespace Tests
             Assert.That(() => 5.Some().Match<int>(null), Throws.ArgumentNullException);
 
         }
+
+        [Test]
+        public void Test_ElementAtOrNone()
+        {
+            Assert.That(() => MaybeExtensions.ElementAtOrNone<int>(null, 0), Throws.ArgumentNullException);
+            Assert.That(() => Array.Empty<int>().SelectSome(x => x).ElementAtOrNone(-10), Throws.ArgumentException);
+
+            var coll = new[] {12, 12351, 123, 11, 0, -88};
+
+            Assert.AreEqual(coll[3], coll.ElementAtOrNone(3).Match(int.MinValue));
+            Assert.That(() => coll.ElementAtOrNone(6).Match(new IndexOutOfRangeException()),
+                Throws.InstanceOf<IndexOutOfRangeException>());
+
+        }
+        [Test]
+        public void Test_FirstOrNone()
+        {
+            Assert.That(() => MaybeExtensions.FirstOrNone<int>(null, null), Throws.ArgumentNullException);
+            Assert.That(() => Array.Empty<int>().FirstOrNone(null), Throws.ArgumentNullException);
+
+            var coll = new[] { 12, 12351, 123, 11, 0, -88 };
+
+            Assert.AreEqual(coll[0], coll.FirstOrNone(x => true).Match(int.MinValue));
+            Assert.That(() => Array.Empty<int>().FirstOrNone(x => false).Match(new IndexOutOfRangeException()),
+                Throws.InstanceOf<IndexOutOfRangeException>());
+
+        }
+
     }
 }
