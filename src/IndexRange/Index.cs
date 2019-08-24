@@ -58,6 +58,7 @@ namespace IndexRange
             => IsFromEnd
                 ? length + _value + 1
                 : _value; 
+        public override string ToString() => $"{(IsFromEnd ? "^" : "")}{Value}";
 
 
         public static Index FromEnd(int value)
@@ -66,10 +67,18 @@ namespace IndexRange
         public static Index FromStart(int value)
             => new Index(value);
 
+
+
         public static implicit operator Index(int value)
             => value >= 0 ? new Index(value) : new Index(-value, true);
 
-        public override string ToString() => $"{(IsFromEnd ? "^" : "")}{Value}";
+        public static Index operator +(Index i, int value)
+            => i.IsFromEnd
+                ? FromEnd(i.Value - value)
+                : FromStart(i.Value + value);
+
+        public static Index operator -(Index i, int value)
+            => i + (-value);
 
     }
 }

@@ -94,17 +94,23 @@ namespace Tests
 
 
         [Test]
-        public void Test_Arithmetic()
+        [TestCase(11)]
+        [TestCase(20)]
+        [TestCase(35)]
+        public void Test_Arithmetic(int length)
         {
             Index i = 4;
             var j = Index.FromEnd(5);
-            var length = 23;
             var newInd = i.Add(j, length);
-            Assert.AreEqual(22, newInd.GetOffset(length));
+            Assert.AreEqual(length - 1, newInd.GetOffset(length));
 
-            newInd = newInd.Add(-10);
+            newInd -= 5;
 
-            Assert.AreEqual(12, newInd.GetOffset(length));
+            Assert.AreEqual(length - 6, newInd.GetOffset(length));
+
+            newInd = newInd.Subtract(Index.FromEnd(length - 1), length);
+
+            Assert.AreEqual(length - 7, newInd.GetOffset(length));
 
         }
 

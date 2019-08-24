@@ -112,12 +112,6 @@ namespace IndexRange
         public static T Get<T>(this IList<T> @this, Index at)
             => (@this ?? throw new ArgumentNullException(nameof(@this)))[at.GetOffset(@this.Count)];
 
-        public static Index Add(this Index i, int val)
-            => i.IsFromEnd
-                ? Index.FromEnd(i.Value - val)
-                : Index.FromStart(i.Value + val);
-
-
         public static Index Add(this Index i1, Index i2, int length)
         {
             if (length <= 0)
