@@ -21,6 +21,7 @@
 //     SOFTWARE.
 
 using System;
+using System.Data.Common;
 
 namespace IndexRange
 {
@@ -57,7 +58,8 @@ namespace IndexRange
         public int GetOffset(int length)
             => IsFromEnd
                 ? length + _value + 1
-                : _value; 
+                : _value;
+
         public override string ToString() => $"{(IsFromEnd ? "^" : "")}{Value}";
 
 
@@ -66,7 +68,6 @@ namespace IndexRange
 
         public static Index FromStart(int value)
             => new Index(value);
-
 
 
         public static implicit operator Index(int value)
@@ -79,6 +80,12 @@ namespace IndexRange
 
         public static Index operator -(Index i, int value)
             => i + (-value);
+
+        public static bool operator ==(Index left, Index right)
+            => left.Equals(right);
+
+        public static bool operator !=(Index left, Index right)
+            => !left.Equals(right);
 
     }
 }

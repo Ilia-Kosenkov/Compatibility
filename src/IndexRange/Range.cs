@@ -82,5 +82,11 @@ namespace IndexRange
 
         public static implicit  operator Range((Index Start, Index End) @this)
             => new Range(@this.Start, @this.End);
+
+        public static bool operator ==(Range left, Range right)
+            => left.Equals(right);
+
+        public static bool operator !=(Range left, Range right)
+            => !left.Equals(right);
     }
 }
