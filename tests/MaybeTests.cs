@@ -22,6 +22,7 @@
 
 using System;
 using System.Linq;
+using System.Security.Policy;
 using Maybe;
 using NUnit.Framework;
 
@@ -98,7 +99,7 @@ namespace Tests
 
             var bytes = new byte[32];
             r.NextBytes(bytes);
-            var collection = bytes.SelectMaybe<byte, int>(x => x).Where(x => x > 200).ToList();
+            var collection = bytes.SelectSome<byte, int>(x => x).Where(x => x > 200).ToList();
 
             var result = collection.Match(200).ToList();
 
@@ -106,5 +107,20 @@ namespace Tests
                 Assert.That(item, Is.GreaterThanOrEqualTo(200));
         }
 
+        [Test]
+        public void Test_NoneMatches()
+        {
+            Assert.That(() => Maybe<int>.None.Match(new InvalidOperationException()), Throws.InstanceOf<InvalidOperationException>());
+        }
+
+        [Test]
+        public void Test_ArgumentNullThrows()
+        {
+            Assert.That(() => 5.Some().Select<int>(null), Throws.ArgumentNullException);
+            Assert.That(() => 5.Some().Where(null), Throws.ArgumentNullException);
+            Assert.That(() => Maybe<int>.None.Match<Exception>(null), Throws.ArgumentNullException);
+            Assert.That(() => 5.Some().Match<int>(null), Throws.ArgumentNullException);
+
+        }
     }
 }

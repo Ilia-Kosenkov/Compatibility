@@ -45,14 +45,14 @@ namespace Maybe
         public static Maybe<T> Some<T>(this T @this)
             => new Maybe<T>(@this);
 
-        public static IEnumerable<Maybe<TTarget>> SelectMaybe<TSource, TTarget>(this IEnumerable<TSource> @this,
+        public static IEnumerable<Maybe<TTarget>> SelectSome<TSource, TTarget>(this IEnumerable<TSource> @this,
             Func<TSource, TTarget> selector)
             where TSource : struct
             => selector is null
                 ? throw new ArgumentNullException(nameof(selector))
                 : @this?.Select(x => new Maybe<TSource>(x).Select(selector));
 
-        public static IEnumerable<Maybe<T>> WhereMaybe<T>(this IEnumerable<T> @this, Func<T, bool> predicate)
+        public static IEnumerable<Maybe<T>> WhereSome<T>(this IEnumerable<T> @this, Func<T, bool> predicate)
             => predicate is null
                 ? throw new ArgumentNullException(nameof(predicate))
                 : @this?.Select(item => new Maybe<T>(item).Where(predicate));
