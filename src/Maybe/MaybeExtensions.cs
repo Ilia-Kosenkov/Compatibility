@@ -45,6 +45,9 @@ namespace Maybe
         public static Maybe<T> Some<T>(this T @this)
             => new Maybe<T>(@this);
 
+        public static Maybe<T> SomeNullable<T>(this T? @this) where T : struct
+            => @this ?? Maybe<T>.None;
+
         public static IEnumerable<Maybe<TTarget>> SelectSome<TSource, TTarget>(this IEnumerable<TSource> @this,
             Func<TSource, TTarget> selector)
             where TSource : struct
@@ -57,7 +60,7 @@ namespace Maybe
                 ? throw new ArgumentNullException(nameof(predicate))
                 : @this?.Select(item => new Maybe<T>(item).Where(predicate));
 
-       public static IEnumerable<Maybe<TTar>> Select<TSrc, TTar>(this IEnumerable<Maybe<TSrc>> @this,
+        public static IEnumerable<Maybe<TTar>> Select<TSrc, TTar>(this IEnumerable<Maybe<TSrc>> @this,
             Func<TSrc, TTar> selector)
             => selector is null
                 ? throw new ArgumentNullException(nameof(selector))
@@ -70,6 +73,38 @@ namespace Maybe
 
         public static IEnumerable<T> Match<T>(this IEnumerable<Maybe<T>> @this, T @default = default)
             => @this?.Select(x => x.Match(@default));
+
+        
+        public static Maybe<T> AggregateSome<T>(this IEnumerable<Maybe<T>> @this,
+            Func<T, T, T> aggregator)
+        {
+            if(aggregator is null)
+                throw new ArgumentNullException(nameof(aggregator));
+            if(@this is null)
+                throw new ArgumentNullException(nameof(@this));
+
+            return @this.Aggregate((old, @new) =>
+                from o in old
+                from n in @new
+                select aggregator(o, n));
+        }
+
+        public static Maybe<TSeed> AggregateSome<T, TSeed>(
+            this IEnumerable<Maybe<T>> @this,
+            Maybe<TSeed> seed,
+            Func<TSeed, T, TSeed> aggregator)
+        {
+            if (aggregator is null)
+                throw new ArgumentNullException(nameof(aggregator));
+            if (@this is null)
+                throw new ArgumentNullException(nameof(@this));
+
+            return @this.Aggregate(seed,
+                (old, @new) =>
+                    from o in old
+                    from n in @new
+                    select aggregator(o, n));
+        }
 
         public static Maybe<T> FirstOrNone<T>(this IEnumerable<T> @this, Func<T, bool> predicate)
         {
@@ -85,5 +120,25 @@ namespace Maybe
             return Maybe<T>.None;
         }
 
+        public static Maybe<T> ElementAtOrNone<T>(this IEnumerable<T> @this, int index)
+        {
+            if(@this is null)
+                throw new ArgumentNullException(nameof(@this));
+
+            if(index < 0 )
+                throw new ArgumentException(nameof(index));
+
+            using (var enumerator = @this.GetEnumerator())
+            {
+                for (var i = 0; enumerator.MoveNext(); i++)
+                {
+                    if (i == index)
+                        return enumerator.Current;
+
+                }
+
+                return Maybe<T>.None;
+            } 
+        }
     }
 }
