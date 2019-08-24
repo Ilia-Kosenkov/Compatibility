@@ -114,5 +114,58 @@ namespace Tests
 
         }
 
+        [Test]
+        public void Test_ToString()
+        {
+            var i1 = Index.FromStart(23);
+            var i2 = Index.FromEnd(23);
+            Assert.AreEqual("23", i1.ToString());
+            Assert.AreEqual("^23", i2.ToString());
+
+            var r1 = Range.All;
+            Range r2 = (i1, i2);
+
+            Assert.AreEqual("[0..^0]", r1.ToString());
+            Assert.AreEqual($"[{i1}..{i2}]", r2.ToString());
+        }
+
+        [Test]
+        public void Test_Equals()
+        {
+            Assert.True(Index.FromStart(5) == 5);
+            Assert.True(Index.FromEnd(5) != 5);
+
+            object o = Index.FromStart(10);
+
+            Assert.True(((Index)10).Equals(o));
+
+            Assert.False(((Index) 10).Equals(null));
+
+            Assert.True(Range.EndAt(Index.FromEnd(10)) == (0, Index.FromEnd(10)));
+            Assert.True(Range.EndAt(Index.FromEnd(10)) != (0, Index.FromStart(10)));
+
+            o = Range.All;
+
+            Assert.True(Range.All.Equals(o));
+            Assert.False(Range.All.Equals(null));
+
+        }
+
+        [Test]
+        public void Test_Hash()
+        {
+            Assert.AreEqual(100.GetHashCode(), Index.FromStart(100).GetHashCode());
+            Assert.AreNotEqual(100.GetHashCode(), Index.FromEnd(100).GetHashCode());
+
+            Assert.AreEqual(((Range)(0, Index.End)).GetHashCode(), Range.All.GetHashCode());
+        }
+
+        [Test]
+        public void Test_OffsetAndLength_Throws()
+        {
+            Assert.That(() => new Range.OffsetAndLength(-10, 10), Throws.InstanceOf<ArgumentException>());
+            Assert.That(() => new Range.OffsetAndLength(10, -10), Throws.InstanceOf<ArgumentException>());
+        }
+
     }
 }
