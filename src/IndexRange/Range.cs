@@ -22,7 +22,7 @@
 
 using System;
 
-namespace Compatibility.Bridge
+namespace IndexRange
 {
     public readonly struct Range : IEquatable<Range>
     {
@@ -48,11 +48,10 @@ namespace Compatibility.Bridge
                 length = Length;
             }
         }
+        public static Range All { get; } = new Range(Index.Start, Index.End);
 
         public Index End { get; }
         public Index Start { get; }
-
-        public static Range All { get; } = new Range(Index.Start, Index.End);
 
         public Range(Index start, Index end)
         {
@@ -65,9 +64,12 @@ namespace Compatibility.Bridge
         public override bool Equals(object value)
             => value is Range other && Equals(other);
 
-        // TODO : Unsure if it will work
-        public override int GetHashCode() => Start.GetHashCode() ^ End.GetHashCode();
+        // Adopted from https://github.com/dotnet/corefx/blob/master/src/System.Reflection.Metadata/src/System/Reflection/Internal/Utilities/Hash.cs#L11
+        public override int GetHashCode()
+            => unchecked(Start.GetHashCode() * (int)0xA5555529 + End.GetHashCode());
+
         public override string ToString() => $"[{Start}..{End}]";
+
         public OffsetAndLength GetOffsetAndLength(int length)
         {
             var start = Start.GetOffset(length);
@@ -78,12 +80,7 @@ namespace Compatibility.Bridge
         public static Range StartAt(Index start) => new Range(start, Index.End);
         public static Range EndAt(Index end) => new Range(Index.Start, end);
 
-        #region APIs not present in the default implementation
-        #if EXTENDED_API
         public static implicit  operator Range((Index Start, Index End) @this)
             => new Range(@this.Start, @this.End);
-        #endif
-        #endregion
-
     }
 }

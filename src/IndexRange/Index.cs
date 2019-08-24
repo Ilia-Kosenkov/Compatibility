@@ -22,7 +22,7 @@
 
 using System;
 
-namespace Compatibility.Bridge
+namespace IndexRange
 {
     public readonly struct Index : IEquatable<Index>
     {

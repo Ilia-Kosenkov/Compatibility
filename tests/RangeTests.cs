@@ -21,7 +21,8 @@
 //     SOFTWARE.
 
 using System;
-using Compatibility.Bridge;
+using IndexRange;
+using MemoryExtensions;
 using NUnit.Framework;
 
 namespace Tests
@@ -91,6 +92,21 @@ namespace Tests
             Assert.IsTrue(span.SequenceEqual(span2));
         }
 
+
+        [Test]
+        public void Test_Arithmetic()
+        {
+            Index i = 4;
+            var j = Index.FromEnd(5);
+            var length = 23;
+            var newInd = i.Add(j, length);
+            Assert.AreEqual(22, newInd.GetOffset(length));
+
+            newInd = newInd.Add(-10);
+
+            Assert.AreEqual(12, newInd.GetOffset(length));
+
+        }
 
     }
 }

@@ -81,13 +81,25 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Bridge\Bridge.csproj">
-      <Project>{17079fe1-2c26-4940-b0ff-c28a8879cac0}</Project>
-      <Name>Bridge</Name>
+    <ProjectReference Include="..\src\IndexRange\IndexRange.csproj">
+      <Project>{34686728-d7fc-4bed-9b62-28d68808abf5}</Project>
+      <Name>IndexRange</Name>
     </ProjectReference>
     <ProjectReference Include="..\src\ITuple\ITuple.csproj">
       <Project>{9ee459e4-3224-43b1-af8c-eb7ca2220016}</Project>
       <Name>ITuple</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\src\Maybe\Maybe.csproj">
+      <Project>{7422f48d-ab29-4263-9a92-eef09306989a}</Project>
+      <Name>Maybe</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\src\MemoryExtensions\MemoryExtensions.csproj">
+      <Project>{359BC3CF-A5AF-4613-9E71-76323FB77CFF}</Project>
+      <Name>MemoryExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\src\TextExtensions\TextExtensions.csproj">
+      <Project>{6f0deaa9-dfb6-4d63-9137-00772b10fb4e}</Project>
+      <Name>TextExtensions</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -23,15 +23,29 @@
 using System;
 using System.Text;
 
-namespace Compatibility.Bridge
+namespace TextExtensions
 {
     public static class TextExtensions
     {
+        public static int CountChars(this string @this, char symbol)
+        {
+            if (@this is null)
+                throw new ArgumentNullException(nameof(@this));
+            if (@this.Length == 0)
+                return 0;
+
+            var counter = 0;
+            for (var i = 0; i < @this.Length; i++)
+                if (i == symbol)
+                    counter++;
+            return counter;
+        }
+
         public static unsafe int GetCharCount(this Encoding encoding, ReadOnlySpan<byte> bytes)
         {
             if (bytes.IsEmpty)
                 return 0;
-            fixed (byte* ptr = &bytes.GetPinnableReference())
+            fixed (byte* ptr = bytes)
                 return encoding.GetCharCount(ptr, bytes.Length);
         }
 
@@ -50,8 +64,8 @@ namespace Compatibility.Bridge
             if (bytes.IsEmpty)
                 return 0;
 
-            fixed (byte* dataPtr = &bytes.GetPinnableReference())
-                fixed (char* strPtr = &chars.GetPinnableReference())
+            fixed (byte* dataPtr = bytes)
+                fixed (char* strPtr = chars)
                     return encoding.GetChars(dataPtr, bytes.Length, strPtr, chars.Length);
         }
 
@@ -73,7 +87,7 @@ namespace Compatibility.Bridge
             if (bytes.IsEmpty)
                 return 0;
 
-            fixed (byte* ptr = &bytes.GetPinnableReference())
+            fixed (byte* ptr = bytes)
                 return decoder.GetCharCount(ptr, bytes.Length, flush);
         }
 
@@ -92,8 +106,8 @@ namespace Compatibility.Bridge
             if (bytes.IsEmpty)
                 return 0;
 
-            fixed (byte* dataPtr = &bytes.GetPinnableReference())
-                fixed (char* strPtr = &chars.GetPinnableReference())
+            fixed (byte* dataPtr = bytes)
+                fixed (char* strPtr = chars)
                     return decoder.GetChars(dataPtr, bytes.Length, strPtr, chars.Length, flush);
         }
 
@@ -116,8 +130,8 @@ namespace Compatibility.Bridge
             out int charsUsed,
             out bool completed)
         {
-            fixed(byte* dataPtr = &bytes.GetPinnableReference())
-                fixed (char* strPtr = &chars.GetPinnableReference())
+            fixed(byte* dataPtr = bytes)
+                fixed (char* strPtr = chars)
                     decoder.Convert(dataPtr, bytes.Length, strPtr, chars.Length, flush,
                         out bytesUsed, out charsUsed, out completed);
         }

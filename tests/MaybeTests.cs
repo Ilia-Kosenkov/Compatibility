@@ -22,11 +22,7 @@
 
 using System;
 using System.Linq;
-using System.Security.AccessControl;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Schema;
-using Compatibility.Bridge;
+using Maybe;
 using NUnit.Framework;
 
 namespace Tests

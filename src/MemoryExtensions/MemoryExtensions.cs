@@ -22,9 +22,9 @@
 
 using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using IndexRange;
 
-namespace Compatibility.Bridge
+namespace MemoryExtensions
 {
     public static class MemoryExtensions
     {
@@ -36,7 +36,6 @@ namespace Compatibility.Bridge
             => new ReadOnlySpan<T>(array, start, length);
         public static ReadOnlyMemory<T> AsReadOnlyMemory<T>(this T[] array, int start, int length)
             => new ReadOnlyMemory<T>(array, start, length);
-
 
         public static bool Any<T>(this ReadOnlySpan<T> @this, Func<T, bool> predicate)
         {
@@ -73,7 +72,6 @@ namespace Compatibility.Bridge
 
             return false;
         }
-
 
         public static bool All<T>(this ReadOnlySpan<T> @this, Func<T, bool> predicate)
         {
@@ -177,5 +175,70 @@ namespace Compatibility.Bridge
 
         public static bool SequenceEqual<T>(this Memory<T> src, ReadOnlyMemory<T> tar) where T : IEquatable<T>
             => src.Span.SequenceEqual(tar.Span);
+
+
+        public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[] array, Range range)
+        {
+            var (offset, length) =
+                range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
+            return new ReadOnlySpan<T>(array, offset, length);
+        }
+
+        public static ReadOnlyMemory<T> AsReadOnlyMemory<T>(this T[] array, Range range)
+        {
+            var (offset, length) =
+                range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
+            return new ReadOnlyMemory<T>(array, offset, length);
+        }
+
+        public static Span<T> AsSpan<T>(this T[] array, Range range)
+        {
+            var (offset, length) =
+                range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
+            return new Span<T>(array, offset, length);
+        }
+
+        public static Memory<T> AsMemory<T>(this T[] array, Range range)
+        {
+            var (offset, length) =
+                range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
+            return new Memory<T>(array, offset, length);
+        }
+
+        public static Span<T> Slice<T>(this Span<T> @this, Range range)
+        {
+            var (offset, length) = range.GetOffsetAndLength(@this.Length);
+            return @this.Slice(offset, length);
+        }
+
+        public static ReadOnlySpan<T> Slice<T>(this ReadOnlySpan<T> @this, Range range)
+        {
+            var (offset, length) = range.GetOffsetAndLength(@this.Length);
+            return @this.Slice(offset, length);
+        }
+
+        public static Memory<T> Slice<T>(this Memory<T> @this, Range range)
+        {
+            var (offset, length) = range.GetOffsetAndLength(@this.Length);
+            return @this.Slice(offset, length);
+        }
+
+        public static ReadOnlyMemory<T> Slice<T>(this ReadOnlyMemory<T> @this, Range range)
+        {
+            var (offset, length) = range.GetOffsetAndLength(@this.Length);
+            return @this.Slice(offset, length);
+        }
+
+        public static T Get<T>(this ReadOnlyMemory<T> @this, Index at)
+            => @this.Span[at.GetOffset(@this.Length)];
+
+        public static T Get<T>(this Memory<T> @this, Index at)
+            => @this.Span[at.GetOffset(@this.Length)];
+
+        public static T Get<T>(this ReadOnlySpan<T> @this, Index at)
+            => @this[at.GetOffset(@this.Length)];
+
+        public static T Get<T>(this Span<T> @this, Index at)
+            => @this[at.GetOffset(@this.Length)];
     }
 }

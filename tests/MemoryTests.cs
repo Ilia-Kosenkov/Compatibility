@@ -21,8 +21,8 @@
 //     SOFTWARE.
 
 using System;
+using MemoryExtensions;
 using NUnit.Framework;
-using Compatibility.Bridge;
 
 namespace Tests
 {

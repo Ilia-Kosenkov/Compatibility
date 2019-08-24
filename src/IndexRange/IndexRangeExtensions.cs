@@ -23,59 +23,10 @@
 using System;
 using System.Collections.Generic;
 
-namespace Compatibility.Bridge
+namespace IndexRange
 {
     public static class IndexRangeExtensions
     {
-        public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[] array, Range range)
-        {
-            var (offset, length) =
-                range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
-            return new ReadOnlySpan<T>(array, offset, length);
-        }
-        public static ReadOnlyMemory<T> AsReadOnlyMemory<T>(this T[] array, Range range)
-        {
-            var (offset, length) =
-                range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
-            return new ReadOnlyMemory<T>(array, offset, length);
-        }
-        public static Span<T> AsSpan<T>(this T[] array, Range range)
-        {
-            var (offset, length) =
-                range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
-            return new Span<T>(array, offset, length);
-        }
-        public static Memory<T> AsMemory<T>(this T[] array, Range range)
-        {
-            var (offset, length) =
-                range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
-            return new Memory<T>(array, offset, length);
-        }
-
-        public static Span<T> Slice<T>(this Span<T> @this, Range range)
-        {
-            var (offset, length) = range.GetOffsetAndLength(@this.Length);
-            return @this.Slice(offset, length);
-        }
-
-        public static ReadOnlySpan<T> Slice<T>(this ReadOnlySpan<T> @this, Range range)
-        {
-            var (offset, length) = range.GetOffsetAndLength(@this.Length);
-            return @this.Slice(offset, length);
-        }
-
-        public static Memory<T> Slice<T>(this Memory<T> @this, Range range)
-        {
-            var (offset, length) = range.GetOffsetAndLength(@this.Length);
-            return @this.Slice(offset, length);
-        }
-
-        public static ReadOnlyMemory<T> Slice<T>(this ReadOnlyMemory<T> @this, Range range)
-        {
-            var (offset, length) = range.GetOffsetAndLength(@this.Length);
-            return @this.Slice(offset, length);
-        }
-
         public static T[] Subarray<T>(this T[] @this, Range range)
         {
             if (@this is null)
@@ -136,33 +87,21 @@ namespace Compatibility.Bridge
             return true;
         }
 
-        public static Maybe<Range.OffsetAndLength> MaybeValid(this Range @this, int length)
+        public static Range.OffsetAndLength? ValidRange(this Range @this, int length)
         {
             if (length <= 0)
-                return Maybe<Range.OffsetAndLength>.None;
+                return null;
 
             var start = @this.Start.GetOffset(length);
             if (start < 0 || start >= length)
-                return Maybe<Range.OffsetAndLength>.None;
+                return null;
 
             var end = @this.End.GetOffset(length);
             if (end <= start || end > length)
-                return Maybe<Range.OffsetAndLength>.None;
+                return null;
 
             return new Range.OffsetAndLength(start, end - start);
         }
-
-        public static T Get<T>(this ReadOnlyMemory<T> @this, Index at)
-            => @this.Span[at.GetOffset(@this.Length)];
-
-        public static T Get<T>(this Memory<T> @this, Index at)
-            => @this.Span[at.GetOffset(@this.Length)];
-
-        public static T Get<T>(this ReadOnlySpan<T> @this, Index at)
-            => @this[at.GetOffset(@this.Length)];
-
-        public static T Get<T>(this Span<T> @this, Index at)
-            => @this[at.GetOffset(@this.Length)];
 
         public static char Get(this string @this, Index at)
             => @this[at.GetOffset(@this.Length)];
@@ -172,6 +111,12 @@ namespace Compatibility.Bridge
 
         public static T Get<T>(this IList<T> @this, Index at)
             => (@this ?? throw new ArgumentNullException(nameof(@this)))[at.GetOffset(@this.Count)];
+
+        public static Index Add(this Index i, int val)
+            => i.IsFromEnd
+                ? Index.FromEnd(i.Value - val)
+                : Index.FromStart(i.Value + val);
+
 
         public static Index Add(this Index i1, Index i2, int length)
         {

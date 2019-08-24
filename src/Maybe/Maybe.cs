@@ -22,7 +22,7 @@
 
 using System;
 
-namespace Compatibility.Bridge
+namespace Maybe
 {
 
     public abstract class Maybe { }
@@ -81,7 +81,6 @@ namespace Compatibility.Bridge
                         ? new Maybe<T>(_value)
                         : new Maybe<T>()
                     : new Maybe<T>();
-
         }
 
         public static implicit operator Maybe<T> (T value)

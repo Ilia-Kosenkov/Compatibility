@@ -21,7 +21,7 @@
 //     SOFTWARE.
 
 using System;
-using Compatibility.Bridge;
+using IndexRange;
 using NUnit.Framework;
 
 namespace Tests

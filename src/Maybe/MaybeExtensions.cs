@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Compatibility.Bridge
+namespace Maybe
 {
     public static class MaybeExtensions
     {
@@ -44,7 +44,6 @@ namespace Compatibility.Bridge
   
         public static Maybe<T> Some<T>(this T @this)
             => new Maybe<T>(@this);
-
 
         public static IEnumerable<Maybe<TTarget>> SelectMaybe<TSource, TTarget>(this IEnumerable<TSource> @this,
             Func<TSource, TTarget> selector)
@@ -69,7 +68,6 @@ namespace Compatibility.Bridge
                 ? throw new ArgumentNullException(nameof(predicate))
                 : @this?.Select(x => x.Where(predicate));
 
-    
         public static IEnumerable<T> Match<T>(this IEnumerable<Maybe<T>> @this, T @default = default)
             => @this?.Select(x => x.Match(@default));
 
