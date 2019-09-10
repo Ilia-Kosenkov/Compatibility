@@ -153,6 +153,7 @@ namespace MemoryExtensions
                 : @this.Slice(range);
         }
 
+        [Obsolete("Use " + nameof(System.MemoryExtensions.TrimEnd), true)]
         public static Span<char> TrimEnd(this Span<char> @this)
         {
             if (@this.IsEmpty)
@@ -170,13 +171,14 @@ namespace MemoryExtensions
                 : @this.Slice(range);
         }
 
+
         public static bool SequenceEqual<T>(this ReadOnlyMemory<T> src, ReadOnlyMemory<T> tar) where T:IEquatable<T>
             => src.Span.SequenceEqual(tar.Span);
 
+        [Obsolete("Use " + nameof(System.MemoryExtensions.SequenceEqual), true)]
         public static bool SequenceEqual<T>(this Memory<T> src, ReadOnlyMemory<T> tar) where T : IEquatable<T>
             => src.Span.SequenceEqual(tar.Span);
-
-
+        
         public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[] array, Range range)
         {
             var (offset, length) =
@@ -240,5 +242,6 @@ namespace MemoryExtensions
 
         public static T Get<T>(this Span<T> @this, Index at)
             => @this[at.GetOffset(@this.Length)];
+        
     }
 }

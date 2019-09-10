@@ -41,6 +41,32 @@ namespace TextExtensions
             return counter;
         }
 
+        public static unsafe int GetByteCount(this Encoding encoding, ReadOnlySpan<char> chars)
+        {
+            fixed (char* ptr = chars)
+                return encoding.GetByteCount(ptr, chars.Length);
+        }
+
+        public static unsafe int GetByteCount(this Encoding encoding, ReadOnlyMemory<char> chars)
+        {
+            using (var mem = chars.Pin())
+                return encoding.GetByteCount((char*) mem.Pointer, chars.Length);
+        }
+
+        public static unsafe int GetBytes(this Encoding encoding, ReadOnlySpan<char> chars, Span<byte> bytes)
+        {
+            fixed(char* cPtr = chars)
+            fixed (byte* bPtr = bytes)
+                return encoding.GetBytes(cPtr, chars.Length, bPtr, bytes.Length);
+        }
+
+        public static unsafe int GetBytes(this Encoding encoding, ReadOnlyMemory<char> chars, Memory<byte> bytes)
+        {
+            using(var cMem = chars.Pin())
+            using (var bMem = bytes.Pin())
+                return encoding.GetBytes((char*) cMem.Pointer, chars.Length, (byte*) bMem.Pointer, bytes.Length);
+        }
+
         public static unsafe int GetCharCount(this Encoding encoding, ReadOnlySpan<byte> bytes)
         {
             if (bytes.IsEmpty)
