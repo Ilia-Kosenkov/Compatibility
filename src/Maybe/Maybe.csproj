@@ -3,6 +3,16 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Platforms>AnyCPU;x64;x86</Platforms>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Ilia Kosenkov</Authors>
+    <Description>A simple implementation of Maybe/Option monad in C#.</Description>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <RepositoryType>github</RepositoryType>
+    <RepositoryUrl>https://github.com/Ilia-Kosenkov/Compatibility</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Optimize>true</Optimize>
   </PropertyGroup>
 
 </Project>
