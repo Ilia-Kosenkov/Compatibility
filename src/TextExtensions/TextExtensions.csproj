@@ -5,6 +5,12 @@
     <AssemblyName>TextExtensions</AssemblyName>
     <RootNamespace>TextExtensions</RootNamespace>
     <Platforms>AnyCPU;x64;x86</Platforms>
+    <Authors>Ilia Kosenkov</Authors>
+    <Company />
+    <Description>Enables usage of Span&lt;T&gt;/Memory&lt;T&gt; with Encoding/Encoder/Decoder to process text.</Description>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/Ilia-Kosenkov/Compatibility</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Ilia-Kosenkov/Compatibility</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -33,6 +39,13 @@
 
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

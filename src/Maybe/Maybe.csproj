@@ -3,11 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Platforms>AnyCPU;x64;x86</Platforms>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageLicenseFile>.\LICENSE.md</PackageLicenseFile>
     <Authors>Ilia Kosenkov</Authors>
-    <Description>A simple implementation of Maybe/Option monad in C#.</Description>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <RepositoryType>github</RepositoryType>
+    <Version>1.0.0</Version>
+    <Company />
+    <Description>Simple implementation of Maybe/Option monad.</Description>
+    <PackageProjectUrl>https://github.com/Ilia-Kosenkov/Compatibility</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Ilia-Kosenkov/Compatibility</RepositoryUrl>
   </PropertyGroup>
 

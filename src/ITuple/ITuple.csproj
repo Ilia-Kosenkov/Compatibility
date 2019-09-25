@@ -3,6 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Platforms>AnyCPU;x64;x86</Platforms>
+    <Authors>Ilia Kosenkov</Authors>
+    <Company />
+    <Description>Provides an implementation if ITuple interface for ValueTuples. While it is not as performance-effective as native ITuple implementation, it allows to perform checks similar to e.g. `x is ITuple tuple &amp;&amp; tuple.Length == 3 &amp;&amp; tuple[2] is string s &amp;&amp; !string.IsNullOrEmpty(s)`, replacing `x is ITuple` by `x.IsValueTuple()`.</Description>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/Ilia-Kosenkov/Compatibility</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Ilia-Kosenkov/Compatibility</RepositoryUrl>
   </PropertyGroup>
 
 </Project>
