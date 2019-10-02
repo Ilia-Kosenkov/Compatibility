@@ -27,13 +27,13 @@ namespace TextExtensions
 
 
         public static bool TryFormat(this sbyte value, Span<char> target, out int charsWritten, IFormatProvider provider = null)
-            => SignedFormat(value, target, out charsWritten, provider);
+            => SignedFormat(value, target, out charsWritten, ReadOnlySpan<char>.Empty, provider);
 
         public static bool TryFormat(this int value, Span<char> target, out int charsWritten, IFormatProvider provider = null)
-            => SignedFormat(value, target, out charsWritten, provider);
+            => SignedFormat(value, target, out charsWritten, ReadOnlySpan<char>.Empty, provider);
 
         public static bool TryFormat(this long value, Span<char> target, out int charsWritten, IFormatProvider provider = null)
-            => SignedFormat(value, target, out charsWritten, provider);
+            => SignedFormat(value, target, out charsWritten,ReadOnlySpan<char>.Empty, provider);
 
         private static int SignificantDigitsCount(this ulong value)
         {
@@ -60,11 +60,11 @@ namespace TextExtensions
             return n == 0 ? 1 : n;
         }
 
-        private static bool UnsignedFormat(this ulong value, Span<char> target, out int charsWritten, IFormatProvider format = null)
+        private static bool UnsignedFormat(this ulong value, Span<char> target, out int charsWritten, IFormatProvider provider = null)
         {
             charsWritten = 0;
 
-            var info = format?.GetFormat(typeof(NumberFormatInfo)) as NumberFormatInfo?? NumberFormatInfo.CurrentInfo;
+            var info = provider?.GetFormat(typeof(NumberFormatInfo)) as NumberFormatInfo?? NumberFormatInfo.CurrentInfo;
 
             if (value == 0)
             {
@@ -107,11 +107,11 @@ namespace TextExtensions
             return true;
         }
 
-        private static bool SignedFormat(this long value, Span<char> target, out int charsWritten, IFormatProvider format = null)
+        private static bool SignedFormat(this long value, Span<char> target, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider = null)
         {
             charsWritten = 0;
 
-            var info = format?.GetFormat(typeof(NumberFormatInfo)) as NumberFormatInfo ?? NumberFormatInfo.CurrentInfo;
+            var info = provider?.GetFormat(typeof(NumberFormatInfo)) as NumberFormatInfo ?? NumberFormatInfo.CurrentInfo;
 
 
             if (value == 0)
@@ -121,8 +121,8 @@ namespace TextExtensions
                     charsWritten = info.NativeDigits[0].Length;
                     return true;
                 }
-                else
-                    return false;
+
+                return false;
             }
 
             var workVal = value;
@@ -136,7 +136,7 @@ namespace TextExtensions
 
 
             var ind = 0;
-
+            
             var n = workVal.SignificantDigitsCount();
 
             Span<char> buff = stackalloc char[4 * n];
