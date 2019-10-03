@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Platforms>AnyCPU;x64;x86</Platforms>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>.\LICENSE.md</PackageLicenseFile>
     <Authors>Ilia Kosenkov</Authors>
     <Version>1.5.0</Version>
