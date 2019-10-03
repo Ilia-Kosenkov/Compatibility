@@ -25,7 +25,14 @@ using System;
 namespace Maybe
 {
 
-    public abstract class Maybe { }
+    public abstract class Maybe
+    {
+        public abstract Maybe<T> Select<T>(Func<object, T> selector);
+        public abstract object Match(object @default = default);
+        public abstract T Match<T>(Func<object, T> selector, T @default = default);
+        public abstract Maybe<T> OfType<T>();
+
+    }
     public sealed class Maybe<T> : Maybe
     {
         public static Maybe<T> None { get; } = new Maybe<T>();
@@ -57,6 +64,23 @@ namespace Maybe
         public T Match(T @default = default)
             => _hasValue ? _value : @default;
 
+        public override TTarget Match<TTarget>(Func<object, TTarget> selector, TTarget @default = default)
+        {
+            if (selector is null)
+                throw new ArgumentNullException(nameof(selector));
+
+            return _hasValue
+                ? selector(_value)
+                : @default;
+        }
+
+        public override Maybe<TTarget> OfType<TTarget>()
+        {
+            if (_hasValue && _value is TTarget targetVal)
+                return targetVal;
+            return Maybe<TTarget>.None;
+        }
+
         public T Match<TExcept>(TExcept except) where TExcept : Exception
             => _hasValue ? _value : throw ((Exception) except ?? new ArgumentNullException(nameof(except)));
 
@@ -83,10 +107,24 @@ namespace Maybe
                     : new Maybe<T>();
         }
 
+        public override object Match(object @default = default)
+            => _hasValue ? _value : @default;
+
+        public override Maybe<TTarget> Select<TTarget>(Func<object, TTarget> selector)
+        {
+            if (selector is null)
+                throw new ArgumentNullException(nameof(selector));
+
+            return _hasValue
+                ? new Maybe<TTarget>(selector(_value))
+                : new Maybe<TTarget>();
+        }
+
         public static implicit operator Maybe<T> (T value)
             => new Maybe<T>(value);
 
         public static implicit operator Maybe<T>(None _)
             => new Maybe<T>();
+
     }
 }
