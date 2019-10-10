@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Globalization;
-using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace TextExtensions
 {
@@ -16,6 +14,15 @@ namespace TextExtensions
         public static int GetSignificantDigitsCount(this ulong value)
             => SignificantDigitsCount(value);
 
+        public static int GetSignificantDigitsCount(this sbyte value)
+            => SignificantDigitsCount(value);
+
+        public static int GetSignificantDigitsCount(this int value)
+            => SignificantDigitsCount(value);
+
+        public static int GetSignificantDigitsCount(this long value)
+            => SignificantDigitsCount(value);
+
         public static bool TryFormat(this byte value, Span<char> target, out int charsWritten, IFormatProvider provider = null)
             => UnsignedFormat(value, target, out charsWritten, provider);
 
@@ -27,13 +34,13 @@ namespace TextExtensions
 
 
         public static bool TryFormat(this sbyte value, Span<char> target, out int charsWritten, IFormatProvider provider = null)
-            => SignedFormat(value, target, out charsWritten, ReadOnlySpan<char>.Empty, provider);
+            => SignedFormat(value, target, out charsWritten, provider);
 
         public static bool TryFormat(this int value, Span<char> target, out int charsWritten, IFormatProvider provider = null)
-            => SignedFormat(value, target, out charsWritten, ReadOnlySpan<char>.Empty, provider);
+            => SignedFormat(value, target, out charsWritten, provider);
 
         public static bool TryFormat(this long value, Span<char> target, out int charsWritten, IFormatProvider provider = null)
-            => SignedFormat(value, target, out charsWritten,ReadOnlySpan<char>.Empty, provider);
+            => SignedFormat(value, target, out charsWritten, provider);
 
         private static int SignificantDigitsCount(this ulong value)
         {
@@ -107,7 +114,7 @@ namespace TextExtensions
             return true;
         }
 
-        private static bool SignedFormat(this long value, Span<char> target, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider = null)
+        private static bool SignedFormat(this long value, Span<char> target, out int charsWritten, IFormatProvider provider = null)
         {
             charsWritten = 0;
 
@@ -173,6 +180,6 @@ namespace TextExtensions
 
             return true;
         }
-
+        
     }
 }

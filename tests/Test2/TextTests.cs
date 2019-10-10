@@ -28,7 +28,7 @@ namespace Tests
 
             Assert.That(1234567890u.TryFormat(buff.AsSpan().Slice(4), out n), Is.True);
             Assert.That((-1234567890).TryFormat(buff.AsSpan().Slice(16), out n), Is.True);
-
+            5.ToString();
         }
     }
 }
