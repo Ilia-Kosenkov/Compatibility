@@ -24,21 +24,20 @@ using System;
 
 namespace Maybe
 {
-    public sealed class None : Maybe
+    public readonly struct None// : Maybe
     {
         public static None Get { get; } = new None();
 
-        private None() { }
-        public override Maybe<T> Select<T>(Func<object, T> selector)
-            => Maybe<T>.None;
+        //public override Maybe<T> Select<T>(Func<object, T> selector)
+        //    => Maybe<T>.None;
 
-        public override object Match(object @default = default)
-            => @default;
+        //public override object Match(object @default = default)
+        //    => @default;
 
-        public override T Match<T>(Func<object, T> selector, T @default = default)
-            => @default;
+        //public override T Match<T>(Func<object, T> selector, T @default = default)
+        //    => @default;
 
-        public override Maybe<T> OfType<T>()
-            => Maybe<T>.None;
+        //public override Maybe<T> OfType<T>()
+        //    => Maybe<T>.None;
     }
 }

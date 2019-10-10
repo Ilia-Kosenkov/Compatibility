@@ -25,26 +25,68 @@ using System;
 namespace Maybe
 {
 
-    public abstract class Maybe
+    //public abstract class Maybe
+    //{
+    //    public abstract Maybe<T> Select<T>(Func<object, T> selector);
+    //    public abstract object Match(object @default = default);
+    //    public abstract T Match<T>(Func<object, T> selector, T @default = default);
+    //    public abstract Maybe<T> OfType<T>();
+
+    //}
+
+    public readonly struct Maybe
     {
-        public abstract Maybe<T> Select<T>(Func<object, T> selector);
-        public abstract object Match(object @default = default);
-        public abstract T Match<T>(Func<object, T> selector, T @default = default);
-        public abstract Maybe<T> OfType<T>();
+        public static Maybe None { get; } = new Maybe();
+
+
+        private readonly object _value;
+        private readonly bool _hasValue;
+
+        public Maybe(object value)
+        {
+            _value = value;
+            _hasValue = value != null;
+        }
+
+        public object Match(object @default = default)
+            => _hasValue ? _value : @default;
+
+        public Maybe<TTarget> Select<TTarget>(Func<object, TTarget> selector)
+        {
+            if (selector is null)
+                throw new ArgumentNullException(nameof(selector));
+
+            return _hasValue
+                ? new Maybe<TTarget>(selector(_value))
+                : new Maybe<TTarget>();
+        }
+
+        public Maybe Where(Func<object, bool> predicate)
+        {
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            return
+                _hasValue
+                    ? predicate(_value)
+                        ? new Maybe(_value)
+                        : new Maybe()
+                    : new Maybe();
+        }
+
+
+        public bool Is<T>() => _hasValue && _value is T;
+        public Maybe<T> As<T>() => Is<T>() ? new Maybe<T>((T) _value) : Maybe<T>.None;
 
     }
-    public sealed class Maybe<T> : Maybe
+
+    public readonly struct Maybe<T>// : Maybe
     {
         public static Maybe<T> None { get; } = new Maybe<T>();
 
         private readonly T _value;
         private readonly bool _hasValue;
         
-        public Maybe()
-        {
-            _hasValue = false;
-        }
-
         public Maybe(T value)
         {
             _value = value;
@@ -64,22 +106,22 @@ namespace Maybe
         public T Match(T @default = default)
             => _hasValue ? _value : @default;
 
-        public override TTarget Match<TTarget>(Func<object, TTarget> selector, TTarget @default = default)
-        {
-            if (selector is null)
-                throw new ArgumentNullException(nameof(selector));
+        //public override TTarget Match<TTarget>(Func<object, TTarget> selector, TTarget @default = default)
+        //{
+        //    if (selector is null)
+        //        throw new ArgumentNullException(nameof(selector));
 
-            return _hasValue
-                ? selector(_value)
-                : @default;
-        }
+        //    return _hasValue
+        //        ? selector(_value)
+        //        : @default;
+        //}
 
-        public override Maybe<TTarget> OfType<TTarget>()
-        {
-            if (_hasValue && _value is TTarget targetVal)
-                return targetVal;
-            return Maybe<TTarget>.None;
-        }
+        //public override Maybe<TTarget> OfType<TTarget>()
+        //{
+        //    if (_hasValue && _value is TTarget targetVal)
+        //        return targetVal;
+        //    return Maybe<TTarget>.None;
+        //}
 
         public T Match<TExcept>(TExcept except) where TExcept : Exception
             => _hasValue ? _value : throw ((Exception) except ?? new ArgumentNullException(nameof(except)));
@@ -107,21 +149,25 @@ namespace Maybe
                     : new Maybe<T>();
         }
 
-        public override object Match(object @default = default)
-            => _hasValue ? _value : @default;
+        //public override object Match(object @default = default)
+            //=> _hasValue ? _value : @default;
 
-        public override Maybe<TTarget> Select<TTarget>(Func<object, TTarget> selector)
-        {
-            if (selector is null)
-                throw new ArgumentNullException(nameof(selector));
+        //public override Maybe<TTarget> Select<TTarget>(Func<object, TTarget> selector)
+        //{
+        //    if (selector is null)
+        //        throw new ArgumentNullException(nameof(selector));
 
-            return _hasValue
-                ? new Maybe<TTarget>(selector(_value))
-                : new Maybe<TTarget>();
-        }
+        //    return _hasValue
+        //        ? new Maybe<TTarget>(selector(_value))
+        //        : new Maybe<TTarget>();
+        //}
 
-        public static implicit operator Maybe<T> (T value)
+        public static explicit operator Maybe<T> (T value)
             => new Maybe<T>(value);
+
+        public static explicit operator Maybe<T>(Maybe maybe) => maybe.As<T>();
+
+        public static implicit operator Maybe(Maybe<T> maybe) => maybe._hasValue ? new Maybe(maybe._value) : Maybe.None;
 
         public static implicit operator Maybe<T>(None _)
             => new Maybe<T>();

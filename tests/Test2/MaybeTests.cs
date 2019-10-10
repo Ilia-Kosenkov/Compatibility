@@ -36,7 +36,7 @@ namespace Tests
         {
 
             Maybe<int> a = 5.Some();
-            Maybe<int> b = 0;
+            Maybe<int> b = 0.Some();
             Maybe<int> c = None.Get;
 
             var r1 = a.Select(x => x + 5).Select(y => y - 4).Select(z => z * z);

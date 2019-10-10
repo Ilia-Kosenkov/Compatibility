@@ -38,7 +38,7 @@ namespace Maybe
             if(selector is null)
                 throw new ArgumentNullException(nameof(selector));
 
-            return @this is null ? new Maybe<TResult>() : @this.Match(x => mapper(x).Select(y => selector(x, y)), None.Get);
+            return @this.Match(x => mapper(x).Select(y => selector(x, y)), None.Get);
         }
 
   
@@ -46,7 +46,7 @@ namespace Maybe
             => new Maybe<T>(@this);
 
         public static Maybe<T> SomeNullable<T>(this T? @this) where T : struct
-            => @this ?? Maybe<T>.None;
+            => @this?.Some() ?? Maybe<T>.None;
 
         public static IEnumerable<Maybe<TTarget>> SelectSome<TSource, TTarget>(this IEnumerable<TSource> @this,
             Func<TSource, TTarget> selector)
@@ -115,7 +115,7 @@ namespace Maybe
 
             foreach (var item in @this)
                 if (predicate(item))
-                    return item;
+                    return item.Some();
 
             return Maybe<T>.None;
         }
@@ -133,7 +133,7 @@ namespace Maybe
                 for (var i = 0; enumerator.MoveNext(); i++)
                 {
                     if (i == index)
-                        return enumerator.Current;
+                        return enumerator.Current.Some();
 
                 }
 
