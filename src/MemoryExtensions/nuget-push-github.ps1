@@ -1,1 +1,1 @@
-nuget push .\bin\x64\Release\*.nupkg -Source "GPR"
+nuget push .\bin\Release\*.nupkg -Source "GPR"

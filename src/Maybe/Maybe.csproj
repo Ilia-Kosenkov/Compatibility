@@ -6,13 +6,13 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>.\LICENSE.md</PackageLicenseFile>
     <Authors>Ilia Kosenkov</Authors>
-    <Version>1.5.0</Version>
+    <Version>2.0.1</Version>
     <Company />
     <Description>Simple implementation of Maybe/Option monad.</Description>
     <PackageProjectUrl>https://github.com/Ilia-Kosenkov/Compatibility</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Ilia-Kosenkov/Compatibility</RepositoryUrl>
-    <AssemblyVersion>1.5.0.0</AssemblyVersion>
-    <FileVersion>1.5.0.0</FileVersion>
+    <AssemblyVersion>2.0.1.0</AssemblyVersion>
+    <FileVersion>2.0.1.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
