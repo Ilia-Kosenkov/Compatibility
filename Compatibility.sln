@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IndexRange", "src\IndexRang
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemoryExtensions", "src\MemoryExtensions\MemoryExtensions.csproj", "{359BC3CF-A5AF-4613-9E71-76323FB77CFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "tests\Test2\Tests.csproj", "{FDB227ED-FFD4-4A1E-948B-945CB4F4AB9D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "tests\Test\Tests.csproj", "{FDB227ED-FFD4-4A1E-948B-945CB4F4AB9D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
