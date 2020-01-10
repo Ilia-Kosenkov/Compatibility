@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemoryExtensions", "src\Mem
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "tests\Test\Tests.csproj", "{FDB227ED-FFD4-4A1E-948B-945CB4F4AB9D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "tests\Benchmarks\Benchmarks.csproj", "{5E7141F1-E150-462F-9DBA-AD7E66834D6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,11 +99,26 @@ Global
 		{FDB227ED-FFD4-4A1E-948B-945CB4F4AB9D}.Release|x64.Build.0 = Release|Any CPU
 		{FDB227ED-FFD4-4A1E-948B-945CB4F4AB9D}.Release|x86.ActiveCfg = Release|Any CPU
 		{FDB227ED-FFD4-4A1E-948B-945CB4F4AB9D}.Release|x86.Build.0 = Release|Any CPU
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C}.Debug|x64.Build.0 = Debug|Any CPU
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C}.Debug|x86.Build.0 = Debug|Any CPU
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C}.Release|x64.ActiveCfg = Release|Any CPU
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C}.Release|x64.Build.0 = Release|Any CPU
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C}.Release|x86.ActiveCfg = Release|Any CPU
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C06BE243-F81B-4A11-BED3-D625F71EB5BE}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5E7141F1-E150-462F-9DBA-AD7E66834D6C} = {30FF34D6-33D6-4BBE-99B3-C1FB41BD86A7}
 	EndGlobalSection
 EndGlobal
