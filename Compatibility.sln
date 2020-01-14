@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "tests\Test\Tests.c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "tests\Benchmarks\Benchmarks.csproj", "{5E7141F1-E150-462F-9DBA-AD7E66834D6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IndexRangeExtensions", "src\IndexRangeExtensions\IndexRangeExtensions.csproj", "{85DA9583-DAF9-42F6-991B-5EBB5E4B7391}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IndexRangeExtensions", "src\IndexRangeExtensions\IndexRangeExtensions.csproj", "{85DA9583-DAF9-42F6-991B-5EBB5E4B7391}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
