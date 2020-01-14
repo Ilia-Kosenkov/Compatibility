@@ -21,7 +21,6 @@
 //     SOFTWARE.
 
 using System;
-using IndexRange;
 using NUnit.Framework;
 
 namespace Tests

@@ -21,9 +21,9 @@
 //     SOFTWARE.
 
 using System;
-using IndexRange;
 using MemoryExtensions;
 using NUnit.Framework;
+using IndexRange;
 
 namespace Tests
 {
@@ -104,7 +104,7 @@ namespace Tests
             var newInd = i.Add(j, length);
             Assert.AreEqual(length - 1, newInd.GetOffset(length));
 
-            newInd -= 5;
+            newInd = newInd.Subtract(5);
 
             Assert.AreEqual(length - 6, newInd.GetOffset(length));
 
