@@ -25,28 +25,28 @@ namespace System
 {
     public readonly struct Range : IEquatable<Range>
     {
-        public readonly struct OffsetAndLength
-        {
-            public int Length { get; }
-            public int Offset { get; }
+        //public readonly struct OffsetAndLength
+        //{
+        //    public int Length { get; }
+        //    public int Offset { get; }
 
-            public OffsetAndLength(int offset, int length)
-            {
-                if (offset < 0)
-                    throw new ArgumentException("Offset cannot be negative.", nameof(offset));
-                if (length <= 0)
-                    throw new ArgumentException("Length should be positive.", nameof(length));
+        //    public OffsetAndLength(int offset, int length)
+        //    {
+        //        if (offset < 0)
+        //            throw new ArgumentException("Offset cannot be negative.", nameof(offset));
+        //        if (length <= 0)
+        //            throw new ArgumentException("Length should be positive.", nameof(length));
 
-                Offset = offset;
-                Length = length;
-            }
+        //        Offset = offset;
+        //        Length = length;
+        //    }
 
-            public void Deconstruct(out int offset, out int length)
-            {
-                offset = Offset;
-                length = Length;
-            }
-        }
+        //    public void Deconstruct(out int offset, out int length)
+        //    {
+        //        offset = Offset;
+        //        length = Length;
+        //    }
+        //}
         public static Range All { get; } = new Range(Index.Start, Index.End);
 
         public Index End { get; }
@@ -69,11 +69,11 @@ namespace System
 
         public override string ToString() => $"[{Start}..{End}]";
 
-        public OffsetAndLength GetOffsetAndLength(int length)
+        public (int Offset, int Length) GetOffsetAndLength(int length)
         {
             var start = Start.GetOffset(length);
             var end = End.GetOffset(length);
-            return new OffsetAndLength(start, end - start);
+            return (Offset: start, Length:  end - start);
         }
         
         public static Range StartAt(Index start) => new Range(start, Index.End);

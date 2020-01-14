@@ -23,7 +23,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace IndexRange
+namespace IndexRangeExtensions
 {
     public static class IndexRangeExtensions
     {
@@ -69,7 +69,7 @@ namespace IndexRange
         }
 
         public static bool IsValidRange(this Range @this, int length,
-            out Range.OffsetAndLength offset)
+            out (int Offset, int Length) offset)
         {
             if (length <= 0)
                 throw new ArgumentException("Length should be positive", nameof(length));
@@ -83,11 +83,11 @@ namespace IndexRange
             if (end <= start || end > length)
                 return false;
 
-            offset = new Range.OffsetAndLength(start, end - start);
+            offset = (Offset: start, Length: end - start);
             return true;
         }
 
-        public static Range.OffsetAndLength? ValidRange(this Range @this, int length)
+        public static (int Offset, int Length)? ValidRange(this Range @this, int length)
         {
             if (length <= 0)
                 return null;
@@ -100,7 +100,7 @@ namespace IndexRange
             if (end <= start || end > length)
                 return null;
 
-            return new Range.OffsetAndLength(start, end - start);
+            return (Offset: start, Length: end - start);
         }
 
         public static char Get(this string @this, Index at)
