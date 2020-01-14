@@ -20,9 +20,8 @@
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
 
-using System;
-
-namespace IndexRange
+// ReSharper disable once CheckNamespace
+namespace System
 {
     public readonly struct Range : IEquatable<Range>
     {

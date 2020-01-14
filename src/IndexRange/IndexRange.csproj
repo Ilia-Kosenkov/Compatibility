@@ -9,14 +9,20 @@
     <Description />
     <RepositoryUrl>https://github.com/Ilia-Kosenkov/Compatibility</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Ilia-Kosenkov/Compatibility</PackageProjectUrl>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <Version>1.0.1</Version>
+    <AssemblyVersion>2.1.0.0</AssemblyVersion>
+    <Version>2.1.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="IndexRange.2.0.0.nupkg" />
+    <None Remove="IndexRange.2.0.1.nupkg" />
+    <None Remove="IndexRange.2.0.2.nupkg" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\..\LICENSE.md">

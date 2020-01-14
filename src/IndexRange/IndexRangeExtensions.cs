@@ -159,6 +159,13 @@ namespace IndexRange
             throw new IndexOutOfRangeException();
         }
 
+        public static Index Add(this Index i, int value)
+            => i.IsFromEnd
+                ? Index.FromEnd(i.Value - value)
+                : Index.FromStart(i.Value + value);
+        public static Index Subtract(this Index i, int value)
+            => i.Add(-value);
+
         public static bool IsStart(this Index i, int length)
             => i.IsFromEnd
                 ? i.GetOffset(length) == 0

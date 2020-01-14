@@ -20,9 +20,8 @@
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
 
-using System;
-
-namespace IndexRange
+// ReSharper disable once CheckNamespace
+namespace System
 {
     public readonly struct Index : IEquatable<Index>
     {
@@ -61,30 +60,19 @@ namespace IndexRange
 
         public override string ToString() => $"{(IsFromEnd ? "^" : "")}{Value}";
 
-
         public static Index FromEnd(int value)
             => new Index(value, true);
 
         public static Index FromStart(int value)
             => new Index(value);
 
-
         public static implicit operator Index(int value)
             => value >= 0 ? new Index(value) : new Index(-value, true);
-
-        public static Index operator +(Index i, int value)
-            => i.IsFromEnd
-                ? FromEnd(i.Value - value)
-                : FromStart(i.Value + value);
-
-        public static Index operator -(Index i, int value)
-            => i + (-value);
 
         public static bool operator ==(Index left, Index right)
             => left.Equals(right);
 
         public static bool operator !=(Index left, Index right)
             => !left.Equals(right);
-
     }
 }

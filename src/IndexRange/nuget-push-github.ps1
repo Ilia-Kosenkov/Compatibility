@@ -1,1 +1,1 @@
-nuget push .\bin\Release\*.nupkg -Source "GPR"
+Get-ChildItem .\bin\Release\*nupkg | Sort-Object -Property LastWriteTime -Desc | Select-Object -First 1 | ForEach-Object {nuget push $_.FullName -Source "GPR"}
