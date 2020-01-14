@@ -77,6 +77,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\IndexRangeExtensions\IndexRangeExtensions.csproj">
+      <Project>{85da9583-daf9-42f6-991b-5ebb5e4b7391}</Project>
+      <Name>IndexRangeExtensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\IndexRange\IndexRange.csproj">
       <Project>{34686728-d7fc-4bed-9b62-28d68808abf5}</Project>
       <Name>IndexRange</Name>

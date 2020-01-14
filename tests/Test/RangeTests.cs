@@ -23,7 +23,7 @@
 using System;
 using MemoryExtensions;
 using NUnit.Framework;
-using IndexRange;
+using IndexRangeExtensions;
 
 namespace Tests
 {
@@ -158,13 +158,6 @@ namespace Tests
             Assert.AreNotEqual(100.GetHashCode(), Index.FromEnd(100).GetHashCode());
 
             Assert.AreEqual(((Range)(0, Index.End)).GetHashCode(), Range.All.GetHashCode());
-        }
-
-        [Test]
-        public void Test_OffsetAndLength_Throws()
-        {
-            Assert.That(() => new Range.OffsetAndLength(-10, 10), Throws.InstanceOf<ArgumentException>());
-            Assert.That(() => new Range.OffsetAndLength(10, -10), Throws.InstanceOf<ArgumentException>());
         }
 
     }

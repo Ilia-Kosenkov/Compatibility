@@ -22,7 +22,7 @@
 
 using System;
 using System.Linq;
-using IndexRange;
+using IndexRangeExtensions;
 
 namespace MemoryExtensions
 {

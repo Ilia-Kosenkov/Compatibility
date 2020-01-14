@@ -9,7 +9,7 @@
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/Ilia-Kosenkov/Compatibility</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Ilia-Kosenkov/Compatibility</RepositoryUrl>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
@@ -38,7 +38,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IndexRange" Version="2.1.0" />
+    <PackageReference Include="IndexRange" Version="2.4.0" />
+    <PackageReference Include="IndexRangeExtensions" Version="1.1.0" />
     <PackageReference Include="System.Memory" Version="4.5.3" />
   </ItemGroup>
 

@@ -10,6 +10,8 @@
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <Copyright>2020, Ilia Kosenkov</Copyright>
     <PackageProjectUrl>https://github.com/Ilia-Kosenkov/Compatibility</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Ilia-Kosenkov/Compatibility</RepositoryUrl>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0' ">
