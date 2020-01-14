@@ -29,9 +29,9 @@ namespace MemoryExtensions
     public static class MemoryExtensions
     {
         public static ReadOnlyMemory<T> AsReadOnlyMemory<T>(this T[] array)
-            => (ReadOnlyMemory<T>) array;
+            => array;
         public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[] array)
-            => (ReadOnlySpan<T>) array;
+            => array;
         public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[] array, int start, int length)
             => new ReadOnlySpan<T>(array, start, length);
         public static ReadOnlyMemory<T> AsReadOnlyMemory<T>(this T[] array, int start, int length)
