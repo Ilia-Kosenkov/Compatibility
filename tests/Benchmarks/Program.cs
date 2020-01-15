@@ -6,7 +6,7 @@ namespace Benchmarks
     {
         private static void Main(string[] args)
         {
-            BenchmarkRunner.Run<RecycledStringBenchmarks>();
+            BenchmarkRunner.Run<StringConcatBenchmarks>();
         }
     }
 }

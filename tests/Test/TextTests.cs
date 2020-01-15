@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 using TextExtensions;
 
@@ -28,7 +29,39 @@ namespace Tests
 
             Assert.That(1234567890u.TryFormat(buff.AsSpan().Slice(4), out n), Is.True);
             Assert.That((-1234567890).TryFormat(buff.AsSpan().Slice(16), out n), Is.True);
-            5.ToString();
+        }
+
+        [Test]
+        [SuppressMessage("ReSharper", "PossiblyImpureMethodCallOnReadonlyVariable")]
+        public void Test_StringBuilder()
+        {
+            using var sb = new SimpleStringBuilder(100);
+            sb.Append(' ');
+            sb.Append('1');
+            sb.Append('2');
+            sb.Append('3');
+            sb.Append('4');
+            sb.Append("Some text");
+            sb.Append(ReadOnlySpan<char>.Empty);
+            sb.Append((string)null);
+            sb.Append('W', 'T', 'F');
+
+            var s = sb.ToString();
+
+            Assert.AreEqual(" 1234Some textWTF", s);
+
+            Assert.IsFalse(sb.View().IsEmpty);
+            sb.Clear();
+            Assert.IsTrue(sb.View().IsEmpty);
+        }
+
+        [Theory]
+        public void Test_EmptyStringBuilder()
+        {
+            var sb = new SimpleStringBuilder();
+            Assume.That(sb.IsDisposed, Is.True);
+            Assert.That(() => sb.Capacity, Throws.InstanceOf<NullReferenceException>());
+            Assert.That(() => sb.Dispose(), Throws.Nothing);
         }
     }
 }
