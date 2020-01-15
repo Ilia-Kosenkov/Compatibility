@@ -79,7 +79,7 @@ namespace System
         public static Range StartAt(Index start) => new Range(start, Index.End);
         public static Range EndAt(Index end) => new Range(Index.Start, end);
 
-        public static implicit  operator Range((Index Start, Index End) @this)
+        public static explicit  operator Range((Index Start, Index End) @this)
             => new Range(@this.Start, @this.End);
 
         public static bool operator ==(Range left, Range right)

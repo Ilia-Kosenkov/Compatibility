@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <LangVersion>8.0</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Ilia Kosenkov</Authors>
     <Company />
@@ -11,11 +12,11 @@
     <Copyright>2020, Ilia Kosenkov</Copyright>
     <PackageProjectUrl>https://github.com/Ilia-Kosenkov/Compatibility</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Ilia-Kosenkov/Compatibility</RepositoryUrl>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0' ">
-    <PackageReference Include="IndexRange" Version="2.3.0" />
+    <PackageReference Include="IndexRange" Version="2.5.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -9,8 +9,8 @@
     <Description />
     <RepositoryUrl>https://github.com/Ilia-Kosenkov/Compatibility</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Ilia-Kosenkov/Compatibility</PackageProjectUrl>
-    <AssemblyVersion>2.4.0.0</AssemblyVersion>
-    <Version>2.4.0</Version>
+    <AssemblyVersion>2.5.0.0</AssemblyVersion>
+    <Version>2.5.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 

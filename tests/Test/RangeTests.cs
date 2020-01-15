@@ -123,7 +123,7 @@ namespace Tests
             Assert.AreEqual("^23", i2.ToString());
 
             var r1 = Range.All;
-            Range r2 = (i1, i2);
+            Range r2 = i1..i2;
 
             Assert.AreEqual("[0..^0]", r1.ToString());
             Assert.AreEqual($"[{i1}..{i2}]", r2.ToString());
@@ -141,8 +141,8 @@ namespace Tests
 
             Assert.False(((Index) 10).Equals(null));
 
-            Assert.True(Range.EndAt(Index.FromEnd(10)) == (0, Index.FromEnd(10)));
-            Assert.True(Range.EndAt(Index.FromEnd(10)) != (0, Index.FromStart(10)));
+            Assert.True(Range.EndAt(^10) == ..Index.FromEnd(10));
+            Assert.True(Range.EndAt(^10) != ..Index.FromStart(10));
 
             o = Range.All;
 
@@ -160,5 +160,27 @@ namespace Tests
             Assert.AreEqual(((Range)(0, Index.End)).GetHashCode(), Range.All.GetHashCode());
         }
 
+        [Test]
+        public void Test_Enumeration()
+        {
+            var rng = ..;
+
+            var count = -1;
+            var len = 15;
+
+            var stat = rng.GetOffsetAndLength(len);
+            var index = stat.Offset - 1;
+
+            foreach (var item in rng.Enumerate(len))
+            {
+                Assert.AreEqual(++index, item);
+                ++count;
+            }
+
+
+            Assert.AreEqual(len, count);
+            Assert.AreEqual(index, stat.Offset + stat.Length);
+
+        }
     }
 }

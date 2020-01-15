@@ -214,5 +214,9 @@ namespace IndexRangeExtensions
                 throw new ArgumentOutOfRangeException(nameof(size));
             return new Range(i.Subtract(size, length), i);
         }
+
+        public static RangeEnumerableProxy Enumerate(this Range range, int length = 1)
+            => new RangeEnumerableProxy(range, length);
+        
     }
 }
