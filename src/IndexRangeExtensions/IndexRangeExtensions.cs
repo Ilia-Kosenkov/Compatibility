@@ -109,7 +109,7 @@ namespace IndexRangeExtensions
         public static T Get<T>(this T[] @this, Index at)
             => (@this ?? throw new ArgumentNullException(nameof(@this)))[at.GetOffset(@this.Length)];
 
-        public static T Get<T>(this IList<T> @this, Index at)
+        public static T Get<T>(this IReadOnlyList<T> @this, Index at)
             => (@this ?? throw new ArgumentNullException(nameof(@this)))[at.GetOffset(@this.Count)];
 
         public static Index Add(this Index i1, Index i2, int length)
