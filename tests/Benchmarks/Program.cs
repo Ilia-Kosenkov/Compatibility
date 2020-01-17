@@ -6,8 +6,8 @@ namespace Benchmarks
     {
         private static void Main(string[] args)
         {
-            //BenchmarkRunner.Run<StringConcatBenchmarks>();
-            BenchmarkRunner.Run<StringBuilderBenchmarks>();
+            BenchmarkRunner.Run<StringConcatBenchmarks>();
+            //BenchmarkRunner.Run<StringBuilderBenchmarks>();
         }
     }
 }
