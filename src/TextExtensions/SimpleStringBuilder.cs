@@ -88,8 +88,6 @@ namespace TextExtensions
             ArrayPool<char>.Shared.Return(_borrowedArray, true);
         }
 
-        void IDisposable.Dispose() => Dispose();
-
         public override string ToString()
             => _offset <= 0
                 ? string.Empty
