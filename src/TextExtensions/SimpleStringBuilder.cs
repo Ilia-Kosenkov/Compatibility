@@ -93,6 +93,10 @@ namespace TextExtensions
                 ? string.Empty
                 : View().ToString();
 
+        public void DeleteBack(int count = 1)
+            => _offset = Math.Max(_offset - count, 0);
+
+
         private void GrowTo(int newCapacity)
         {
             if (newCapacity <= Capacity) return;
