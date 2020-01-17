@@ -6,6 +6,7 @@ using TextExtensions;
 namespace Benchmarks
 {
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
+    [MemoryDiagnoser]
     public class StringConcatBenchmarks
     {
         public string s = @";Lorem ipsum dolor sit amet, consectetur adipiscing";
@@ -30,6 +31,17 @@ namespace Benchmarks
             {
                 builder.Append(c);
                 builder.Append(s);
+                return builder.ToString();
+            }
+        }
+
+        [Benchmark]
+        public string FixedStringBuilder()
+        {
+            using (var builder = new FixedStringBuilder(stackalloc char[s.Length + 8]))
+            {
+                builder.TryAppend(c);
+                builder.TryAppend(s);
                 return builder.ToString();
             }
         }

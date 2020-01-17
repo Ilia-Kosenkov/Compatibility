@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Buffers;
+using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using TextExtensions;
@@ -9,7 +11,7 @@ namespace Benchmarks
     [MemoryDiagnoser]
     public class StringBuilderBenchmarks
     {
-        [Params(10, 100, 1_000, 10_000, 100_000)]
+        [Params(10, 31, 32, 33, 63, 64, 65, 127, 128, 129)]
         public int N;
         public string _str;
 
@@ -18,7 +20,7 @@ namespace Benchmarks
         [Benchmark(Baseline = true)]
         public void StringBuilder_AppendChar()
         {
-            var builder = new StringBuilder(10 * N);
+            var builder = new StringBuilder(N + 4);
             var c = X;
             for (var i = 0; i < N; i++)
             {
@@ -44,7 +46,7 @@ namespace Benchmarks
         [Benchmark]
         public void SimpleStringBuilder_AppendChar()
         {
-            using var builder = new SimpleStringBuilder(10 * N);
+            using var builder = new SimpleStringBuilder(N + 4);
             var c = X;
 
             for (var i = 0; i < N; i++)
@@ -55,10 +57,27 @@ namespace Benchmarks
 
             _str = builder.ToString();
         }
+
+        [Benchmark]
+        public void FixedStringBuilder_AppendChar()
+        {
+           
+            using var builder = new FixedStringBuilder(stackalloc char[N + 4]);
+            var c = X;
+
+            for (var i = 0; i < N; i++)
+            {
+                // ReSharper disable once PossiblyImpureMethodCallOnReadonlyVariable
+                builder.TryAppend(c);
+            }
+
+            _str = builder.ToString();
+            
+        }
         [Benchmark]
         public void SimpleStringBuilder_AppendChar_Dispose()
         {
-            var builder = new SimpleStringBuilder(10 * N);
+            var builder = new SimpleStringBuilder(N + 4);
             try
             {
                 var c = X;

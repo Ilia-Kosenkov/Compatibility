@@ -55,6 +55,30 @@ namespace Tests
             Assert.IsTrue(sb.View().IsEmpty);
         }
 
+        [Test]
+        [SuppressMessage("ReSharper", "PossiblyImpureMethodCallOnReadonlyVariable")]
+        public void Test_StackStringBuilder()
+        {
+            using var sb = new FixedStringBuilder(stackalloc char[32]);
+            sb.TryAppend(' ');
+            sb.TryAppend('1');
+            sb.TryAppend('2');
+            sb.TryAppend('3');
+            sb.TryAppend('4');
+            sb.TryAppend("Some text");
+            sb.TryAppend(ReadOnlySpan<char>.Empty);
+            sb.TryAppend((string)null);
+            sb.TryAppend('W', 'T', 'F');
+
+            var s = sb.ToString();
+
+            Assert.AreEqual(" 1234Some textWTF", s);
+
+            Assert.IsFalse(sb.View().IsEmpty);
+            sb.Clear();
+            Assert.IsTrue(sb.View().IsEmpty);
+        }
+
         [Theory]
         public void Test_EmptyStringBuilder()
         {
