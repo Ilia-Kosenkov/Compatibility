@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 
 namespace MemoryExtensions
 {
@@ -32,6 +34,24 @@ namespace MemoryExtensions
         public static ReadOnlySpan<T> AsReadOnlySpan<T>(this T[] array, int start, int length)
             => new ReadOnlySpan<T>(array, start, length);
 
+        public static ReadOnlySpan<char> AsSpan(this string text, Range range)
+        {
+            if(string.IsNullOrEmpty(text))
+                return ReadOnlySpan<char>.Empty;
+            var (offset, length) = range.GetOffsetAndLength(text.Length);
+            return text.AsSpan(offset, length);
+        }
+
+
+        public static ReadOnlyMemory<char> AsMemory(this string text, Range range)
+        {
+            if(string.IsNullOrEmpty(text))
+                return ReadOnlyMemory<char>.Empty;
+            var (offset, length) = range.GetOffsetAndLength(text.Length);
+            return text.AsMemory(offset, length);
+        }
+
+
         public static Span<T> AsSpan<T>(this T[] array, Range range)
         {
             var (offset, length) =
@@ -45,6 +65,7 @@ namespace MemoryExtensions
                 range.GetOffsetAndLength(array?.Length ?? throw new ArgumentNullException(nameof(array)));
             return new Memory<T>(array, offset, length);
         }
+
 
         #endregion
     }
