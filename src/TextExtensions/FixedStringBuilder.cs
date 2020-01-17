@@ -75,7 +75,7 @@ namespace TextExtensions
 
         public void Clear() => _offset = 0;
 
-        public ReadOnlySpan<char> View() => _buffer;
+        public ReadOnlySpan<char> View() => _buffer.Slice(0, _offset);
 
         public bool TryMoveTo(Span<char> target)
         {
@@ -88,7 +88,7 @@ namespace TextExtensions
         public override string ToString()
             => _offset <= 0
                 ? string.Empty
-                : _buffer.ToString();
+                : _buffer.Slice(0, _offset).ToString();
 
         public void Dispose()
         {
